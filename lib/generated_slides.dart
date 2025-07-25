@@ -11,7 +11,7 @@ class GeneratedSlide1 extends FlutterDeckSlideWidget {
             title: """Why?""",
             hidden: false,
             steps: 3,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -55,7 +55,7 @@ class GeneratedSlide2 extends FlutterDeckSlideWidget {
             title: """COMMENT This isn't shown!""",
             hidden: true,
             steps: 0,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -86,7 +86,7 @@ class GeneratedSlide3 extends FlutterDeckSlideWidget {
             title: """Initial Setup""",
             hidden: false,
             steps: 0,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -104,7 +104,7 @@ class GeneratedSlide3 extends FlutterDeckSlideWidget {
     :custom
     (org-image-actual-width nil))
 
-''', language: '''emacs-lisp''', textStyle: GoogleFonts.firaCode(),)
+''', language: '''emacs-lisp''', textStyle: GoogleFonts.robotoMono(),)
           ],
         ),
       ),
@@ -121,7 +121,7 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
             title: """What Can It Do?""",
             hidden: false,
             steps: 5,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -246,7 +246,7 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
             title: """Profiles""",
             hidden: false,
             steps: 3,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -333,7 +333,7 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
             title: """Customization""",
             hidden: false,
             steps: 0,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -388,7 +388,7 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
     (org-tree-slide-breadcrumbs " > ")
     (org-image-actual-width nil))
 
-''', language: '''emacs-lisp''', textStyle: GoogleFonts.firaCode(),),
+''', language: '''emacs-lisp''', textStyle: GoogleFonts.robotoMono(),),
               ),
             )
           ],
@@ -407,7 +407,7 @@ class GeneratedSlide7 extends FlutterDeckSlideWidget {
             title: """Generating a PDF of Slides""",
             hidden: false,
             steps: 0,
-            transition: FlutterDeckTransition.slide(),
+            transition: FlutterDeckTransition.none(),
           ),
         );
 
@@ -431,50 +431,6 @@ More documentation: https://orgmode.org/worg/exporters/beamer/tutorial.html
 
 }
 
-class GeneratedSlide8 extends FlutterDeckSlideWidget {
-  const GeneratedSlide8()
-      : super(
-          configuration: const FlutterDeckSlideConfiguration(
-            route: '/code-highlight',
-            header: FlutterDeckHeaderConfiguration(title: 'Code Highlighting'),
-          ),
-        );
-
-  @override
-  Widget build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => const Center(
-        child: FlutterDeckCodeHighlight(
-          code: '''
-import 'package:flutter/material.dart';
-import 'package:flutter_deck/flutter_deck.dart';
-
-class CodeHighlightSlide extends FlutterDeckSlideWidget {
-  const CodeHighlightSlide()
-      : super(
-          configuration: const FlutterDeckSlideConfiguration(
-            route: '/code-highlight',
-            header: FlutterDeckHeaderConfiguration(title: 'Code Highlighting'),
-          ),
-        );
-
-  @override
-  Widget build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => const Center(
-        child: Text('Use FlutterDeckCodeHighlight widget to highlight code!'),
-      ),
-    );
-  }
-}''',
-          fileName: 'code_highlight_slide.dart',
-          language: 'dart',
-        ),
-      ),
-    );
-  }
-}
-
 const generatedSlides = <FlutterDeckSlideWidget>[
   const GeneratedSlide1(),
   const GeneratedSlide2(),
@@ -483,5 +439,4 @@ const generatedSlides = <FlutterDeckSlideWidget>[
   const GeneratedSlide5(),
   const GeneratedSlide6(),
   const GeneratedSlide7(),
-  const GeneratedSlide8(),
 ];

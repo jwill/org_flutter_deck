@@ -103,3 +103,17 @@ You can specify the width and height of the image using `#+ATTR_HTML`.
 
 [[https://example.com/remote-image.jpg]]
 ```
+
+## Presenter View
+
+This project supports a presenter view, which allows you to control the presentation from a separate window. To use the presenter view, follow these steps:
+
+1.  Run the app in presenter mode by using the `--dart-define=PRESENTER_MODE=true` flag:
+
+    ```bash
+    flutter run --dart-define=PRESENTER_MODE=true
+    ```
+
+2.  Open a browser and navigate to the URL displayed in the console. This will be the presenter view, where you can control the slides.
+
+3.  The app window will display the presentation, which will be controlled by the presenter view.
