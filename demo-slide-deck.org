@@ -2,6 +2,9 @@
 #+author: System Crafters
 
 * Why?
+:NOTES:
+Remember to talk about how easy it is to use Org Mode for presentations.
+:END:
 
 - No need for complicated presentation software
 - Impress and/or confuse your coworkers

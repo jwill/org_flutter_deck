@@ -11,6 +11,8 @@ class GeneratedSlide1 extends FlutterDeckSlideWidget {
             title: """Why?""",
             hidden: false,
             steps: 3,
+            notes: """Remember to talk about how easy it is to use Org Mode for presentations.
+""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -55,6 +57,7 @@ class GeneratedSlide2 extends FlutterDeckSlideWidget {
             title: """COMMENT This isn't shown!""",
             hidden: true,
             steps: 0,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -86,6 +89,7 @@ class GeneratedSlide3 extends FlutterDeckSlideWidget {
             title: """Initial Setup""",
             hidden: false,
             steps: 0,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -121,6 +125,7 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
             title: """What Can It Do?""",
             hidden: false,
             steps: 5,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -246,6 +251,7 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
             title: """Profiles""",
             hidden: false,
             steps: 3,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -333,6 +339,7 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
             title: """Customization""",
             hidden: false,
             steps: 0,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -407,6 +414,7 @@ class GeneratedSlide7 extends FlutterDeckSlideWidget {
             title: """Generating a PDF of Slides""",
             hidden: false,
             steps: 0,
+            notes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );

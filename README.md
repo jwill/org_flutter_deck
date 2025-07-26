@@ -42,6 +42,20 @@ To create a slide that is not included in the presentation, add the `COMMENT` ke
 * COMMENT This slide will be hidden
 ```
 
+### Speaker Notes
+
+You can add speaker notes to a slide by using a `:NOTES:` drawer. These notes will be available in the presenter view.
+
+```org
+* Slide with Speaker Notes
+:NOTES:
+This is a speaker note.
+It can span multiple lines.
+:END:
+
+This is the slide content.
+```
+
 ### Content
 
 Any text directly under a slide heading will be added as content to the slide.

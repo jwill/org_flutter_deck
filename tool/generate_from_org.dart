@@ -13,6 +13,7 @@ void main(List<String> args) {
   final slides = <Map<String, dynamic>>[];
   Map<String, dynamic>? currentSlide;
   var inCodeBlock = false;
+  var inNotesDrawer = false;
   var codeBlockContent = '';
   var codeBlockLanguage = '';
   Map<String, dynamic>? lastBullet;
@@ -32,6 +33,7 @@ void main(List<String> args) {
       currentSlide = {
         'title': title,
         'content': '',
+        'notes': '',
         'hidden': title.contains('COMMENT'),
         'code': null,
         'language': null,
@@ -66,6 +68,14 @@ void main(List<String> args) {
       }
     } else if (inCodeBlock) {
       codeBlockContent += '$line\n';
+    } else if (line.trim() == ':NOTES:') {
+      inNotesDrawer = true;
+    } else if (line.trim() == ':END:') {
+      inNotesDrawer = false;
+    } else if (inNotesDrawer) {
+      if (currentSlide != null) {
+        currentSlide['notes'] = '${currentSlide['notes']}$line\n';
+      }
     }
     else if (line.startsWith('#+ATTR_HTML')) {
       final widthRegex = RegExp(r':width\s+(\d+)');
@@ -331,6 +341,7 @@ void generateSlidesFile(List<Map<String, dynamic>> slides, {bool showAllBullets 
     final slide = slides[i];
     final title = slide['title'] as String;
     final hidden = slide['hidden'] as bool;
+    final notes = slide['notes'] as String;
     final bullets = slide['bullets'] as List<Map<String, dynamic>>;
     final contentSteps = slide['content_steps'] as List<String>? ?? [];
     var stepsCount = contentSteps.isNotEmpty ? contentSteps.length : bullets.length;
@@ -364,6 +375,7 @@ class $className extends FlutterDeckSlideWidget {
             title: """$title""",
             hidden: $hidden,
             steps: $stepsCount,
+            notes: """$notes""",
             transition: $transitionValue,
           ),
         );
