@@ -138,3 +138,12 @@ Run =org-beamer-export-to-pdf=, requires =pdflatex= and associated tools though!
 
 More documentation: https://orgmode.org/worg/exporters/beamer/tutorial.html
 
+* Flutter Widget Demo
+
+#+BEGIN_FLUTTER
+CustomPaint(
+  size: const Size(200, 200),
+  painter: TrianglePainter(),
+)
+#+END_FLUTTER
+

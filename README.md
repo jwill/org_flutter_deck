@@ -100,6 +100,21 @@ Include code blocks in your slides using the standard Org Mode syntax. The langu
 #+end_src
 ```
 
+### Embedding Flutter Widgets
+
+You can embed a runnable Flutter widget in a slide by using a `#+BEGIN_FLUTTER` block. The widget will be rendered on the slide.
+
+```org
+* Slide with an Embedded Widget
+
+#+BEGIN_FLUTTER
+CustomPaint(
+  size: const Size(200, 200),
+  painter: TrianglePainter(),
+)
+#+END_FLUTTER
+```
+
 ### Images
 
 You can add images to slides. Both local and remote images are supported.

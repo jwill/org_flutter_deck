@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_deck/flutter_deck.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:flutter_deck_ai/src/painters.dart';
 
 class GeneratedSlide1 extends FlutterDeckSlideWidget {
   const GeneratedSlide1()
@@ -11,7 +12,7 @@ class GeneratedSlide1 extends FlutterDeckSlideWidget {
             title: """Why?""",
             hidden: false,
             steps: 3,
-            notes: """Remember to talk about how easy it is to use Org Mode for presentations.
+            speakerNotes: """Remember to talk about how easy it is to use Org Mode for presentations.
 """,
             transition: FlutterDeckTransition.none(),
           ),
@@ -57,7 +58,7 @@ class GeneratedSlide2 extends FlutterDeckSlideWidget {
             title: """COMMENT This isn't shown!""",
             hidden: true,
             steps: 0,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -89,7 +90,7 @@ class GeneratedSlide3 extends FlutterDeckSlideWidget {
             title: """Initial Setup""",
             hidden: false,
             steps: 0,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -125,7 +126,7 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
             title: """What Can It Do?""",
             hidden: false,
             steps: 5,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -251,7 +252,7 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
             title: """Profiles""",
             hidden: false,
             steps: 3,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -339,7 +340,7 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
             title: """Customization""",
             hidden: false,
             steps: 0,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -414,7 +415,7 @@ class GeneratedSlide7 extends FlutterDeckSlideWidget {
             title: """Generating a PDF of Slides""",
             hidden: false,
             steps: 0,
-            notes: """""",
+            speakerNotes: """""",
             transition: FlutterDeckTransition.none(),
           ),
         );
@@ -439,12 +440,50 @@ More documentation: https://orgmode.org/worg/exporters/beamer/tutorial.html
 
 }
 
+class GeneratedSlide8 extends FlutterDeckSlideWidget {
+  const GeneratedSlide8()
+      : super(
+          configuration: const FlutterDeckSlideConfiguration(
+            route: '/GeneratedSlide8',
+            title: """Flutter Widget Demo""",
+            hidden: false,
+            steps: 0,
+            speakerNotes: """""",
+            transition: FlutterDeckTransition.none(),
+          ),
+        );
+
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.blank(
+      builder: (context) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("""Flutter Widget Demo""", style: Theme.of(context).textTheme.headlineLarge),
+            const SizedBox(height: 16),
+            Expanded(
+              child: CustomPaint(
+  size: const Size(200, 200),
+  painter: TrianglePainter(),
+)
+,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+}
+
 const generatedSlides = <FlutterDeckSlideWidget>[
-  const GeneratedSlide1(),
-  const GeneratedSlide2(),
-  const GeneratedSlide3(),
-  const GeneratedSlide4(),
-  const GeneratedSlide5(),
-  const GeneratedSlide6(),
-  const GeneratedSlide7(),
+  GeneratedSlide1(),
+  GeneratedSlide2(),
+  GeneratedSlide3(),
+  GeneratedSlide4(),
+  GeneratedSlide5(),
+  GeneratedSlide6(),
+  GeneratedSlide7(),
+  GeneratedSlide8(),
 ];

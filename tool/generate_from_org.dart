@@ -14,8 +14,10 @@ void main(List<String> args) {
   Map<String, dynamic>? currentSlide;
   var inCodeBlock = false;
   var inNotesDrawer = false;
+  var inFlutterBlock = false;
   var codeBlockContent = '';
   var codeBlockLanguage = '';
+  var flutterBlockContent = '';
   Map<String, dynamic>? lastBullet;
 
   for (final line in lines) {
@@ -37,6 +39,7 @@ void main(List<String> args) {
         'hidden': title.contains('COMMENT'),
         'code': null,
         'language': null,
+        'flutterWidget': null,
         'imageUri': null,
         'imageWidth': null,
         'imageHeight': null,
@@ -53,7 +56,7 @@ void main(List<String> args) {
           'imageWidth': null,
           'imageHeight': null,
         };
-        (currentSlide['bullets'] as List<Map<String, dynamic>>).add(lastBullet!);
+        (currentSlide['bullets'] as List<Map<String, dynamic>>).add(lastBullet);
       }
     } else if (line.startsWith('#+begin_src')) {
       inCodeBlock = true;
@@ -68,6 +71,16 @@ void main(List<String> args) {
       }
     } else if (inCodeBlock) {
       codeBlockContent += '$line\n';
+    } else if (line.startsWith('#+BEGIN_FLUTTER')) {
+      inFlutterBlock = true;
+      flutterBlockContent = '';
+    } else if (line.startsWith('#+END_FLUTTER')) {
+      inFlutterBlock = false;
+      if (currentSlide != null) {
+        currentSlide['flutterWidget'] = flutterBlockContent;
+      }
+    } else if (inFlutterBlock) {
+      flutterBlockContent += '$line\n';
     } else if (line.trim() == ':NOTES:') {
       inNotesDrawer = true;
     } else if (line.trim() == ':END:') {
@@ -123,11 +136,34 @@ String _generateBuildMethod(Map<String, dynamic> slide, {bool showAllBullets = f
   final content = slide['content'] as String;
   final code = slide['code'] as String?;
   final language = slide['language'] as String?;
+  final flutterWidget = slide['flutterWidget'] as String?;
   final imageUri = slide['imageUri'] as String?;
   final imageWidth = slide['imageWidth'] as double?;
   final imageHeight = slide['imageHeight'] as double?;
   final bullets = slide['bullets'] as List<Map<String, dynamic>>;
   final contentSteps = slide['content_steps'] as List<String>?;
+
+  if (flutterWidget != null) {
+    return '''
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.blank(
+      builder: (context) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("""$title""", style: Theme.of(context).textTheme.headlineLarge),
+            const SizedBox(height: 16),
+            Expanded(
+              child: $flutterWidget,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+''';
+  }
 
   if (imageUri != null) {
     var uri = imageUri;
@@ -334,6 +370,7 @@ void generateSlidesFile(List<Map<String, dynamic>> slides, {bool showAllBullets 
   buffer.writeln("import 'package:flutter/material.dart';");
   buffer.writeln("import 'package:flutter_deck/flutter_deck.dart';");
   buffer.writeln("import 'package:google_fonts/google_fonts.dart';");
+  buffer.writeln("import 'package:flutter_deck_ai/src/painters.dart';");
   
   buffer.writeln();
 
@@ -375,7 +412,7 @@ class $className extends FlutterDeckSlideWidget {
             title: """$title""",
             hidden: $hidden,
             steps: $stepsCount,
-            notes: """$notes""",
+            speakerNotes: """$notes""",
             transition: $transitionValue,
           ),
         );
@@ -387,7 +424,7 @@ ${_generateBuildMethod(slide, showAllBullets: showAllBullets)}
 
   buffer.writeln('const generatedSlides = <FlutterDeckSlideWidget>[');
   for (var i = 0; i < slides.length; i++) {
-    buffer.writeln('  const GeneratedSlide${i + 1}(),');
+    buffer.writeln('  GeneratedSlide${i + 1}(),');
   }
   buffer.writeln('];');
 
