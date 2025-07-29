@@ -162,3 +162,14 @@ The only way to do great work is to love what you do.
 - Steve Jobs
 #+END_QUOTE
 
+* Plot Demo
+
+#+PLOT: title:"Sample Line Chart" type:2d with:lines
+| X | Y |
+|---+---|
+| 1 | 2 |
+| 2 | 3 |
+| 3 | 5 |
+| 4 | 4 |
+| 5 | 6 |
+

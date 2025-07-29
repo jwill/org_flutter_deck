@@ -206,130 +206,211 @@ Method _generateBuildMethod(Map<String, dynamic> slide,
     {bool showAllBullets = false}) {
   final plot = slide['plot'] as Map<String, dynamic>?;
   if (plot != null) {
-    final plotTitle = plot['title'] as String;
-    final data = plot['data'] as List<List<String>>;
-    final spots = data.skip(1).map((row) {
-      final x = double.tryParse(row[0]) ?? 0.0;
-      final y = double.tryParse(row[1]) ?? 0.0;
-      return refer('FlSpot').newInstance([literalNum(x), literalNum(y)]);
-    }).toList();
-    final lineChart = refer('LineChart').newInstance([
-      refer('LineChartData').newInstance([], {
-        'lineBarsData': literalList([
-          refer('LineChartBarData').newInstance([], {
-            'spots': literalList(spots),
-          })
-        ]),
-      })
-    ]);
-    return Method((b) => b
-      ..name = 'build'
-      ..returns = refer('FlutterDeckSlide')
-      ..annotations.add(refer('override'))
-      ..requiredParameters.add(Parameter((b) => b
-        ..name = 'context'
-        ..type = refer('BuildContext')))
-      ..body = refer('FlutterDeckSlide.blank').call([], {
-        'builder': Method((b) => b
-          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-          ..body = refer('Center').newInstance([], {
-            'child': refer('Column').newInstance([], {
-              'mainAxisAlignment':
-                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-              'children': literalList([
-                refer('Text').call([
-                  literalString(plotTitle)
-                ], {
-                  'style': refer('Theme.of')
-                      .call([refer('context')])
-                      .property('textTheme')
-                      .property('headlineLarge')
-                }),
-                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-                refer('Expanded').newInstance([], {'child': lineChart}),
-              ])
-            })
-          }).code,
-        ).closure,
-      }).returned.statement);
+    return _generatePlotSlide(slide);
   }
 
   final quote = slide['quote'] as String?;
   final attribution = slide['attribution'] as String?;
 
   if (quote != null && attribution != null) {
-    return Method((b) => b
-      ..name = 'build'
-      ..returns = refer('FlutterDeckSlide')
-      ..annotations.add(refer('override'))
-      ..requiredParameters.add(Parameter((b) => b
-        ..name = 'context'
-        ..type = refer('BuildContext')))
-      ..body = refer('FlutterDeckSlide.quote').call([], {
-        'quote': literalString(quote),
-        'attribution': literalString(attribution),
-      }).returned.statement);
+    return _generateQuoteSlide(slide);
   }
 
-  final title = slide['title'] as String;
   final table = slide['table'] as List<List<String>>?;
 
   if (table != null) {
-    final header = table.first;
-    final rows = table.skip(1).toList();
-    final columns = header
-        .map((cell) => refer('DataColumn')
-            .newInstance([], {'label': refer('Text').call([literalString(cell)])}))
-        .toList();
-    final dataRows = rows.map((row) {
-      final cells = row
-          .map((cell) =>
-              refer('DataCell').newInstance([refer('Text').call([literalString(cell)])]))
-          .toList();
-      return refer('DataRow').newInstance([], {
-        'cells': literalList(cells),
-      });
-    }).toList();
-
-    final tableWidget = refer('DataTable').newInstance([], {
-      'columns': literalList(columns),
-      'rows': literalList(dataRows),
-    });
-
-    return Method((b) => b
-      ..name = 'build'
-      ..returns = refer('FlutterDeckSlide')
-      ..annotations.add(refer('override'))
-      ..requiredParameters.add(Parameter((b) => b
-        ..name = 'context'
-        ..type = refer('BuildContext')))
-      ..body = refer('FlutterDeckSlide.blank').call([], {
-        'builder': Method((b) => b
-          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-          ..body = refer('Center').newInstance([], {
-            'child': refer('Column').newInstance([], {
-              'mainAxisAlignment':
-                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-              'children': literalList([
-                refer('Text').call([
-                  literalString(title)
-                ], {
-                  'style': refer('Theme.of')
-                      .call([refer('context')])
-                      .property('textTheme')
-                      .property('headlineLarge')
-                }),
-                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-                tableWidget,
-              ])
-            })
-          }).code,
-        ).closure,
-      }).returned.statement);
+    return _generateTableSlide(slide);
   }
 
   final flutterWidget = slide['flutterWidget'] as String?;
   if (flutterWidget != null) {
+    return _generateFlutterWidgetSlide(slide);
+  }
+
+  final imageUri = slide['imageUri'] as String?;
+  if (imageUri != null) {
+    return _generateImageSlide(slide);
+  }
+
+  return _generateContentSlide(slide, showAllBullets: showAllBullets);
+}
+
+Method _generatePlotSlide(Map<String, dynamic> slide) {
+  final plot = slide['plot'] as Map<String, dynamic>;
+  final plotTitle = plot['title'] as String;
+  final data = plot['data'] as List<List<String>>;
+  final spots = data.skip(1).map((row) {
+    final x = double.tryParse(row[0]) ?? 0.0;
+    final y = double.tryParse(row[1]) ?? 0.0;
+    return refer('FlSpot').newInstance([literalNum(x), literalNum(y)]);
+  }).toList();
+  final lineChart = refer('LineChart').newInstance([
+    refer('LineChartData').newInstance([], {
+      'lineBarsData': literalList([
+        refer('LineChartBarData').newInstance([], {
+          'spots': literalList(spots),
+        })
+      ]),
+    })
+  ]);
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.blank').call([], {
+      'builder': Method((b) => b
+        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+        ..body = refer('Center').newInstance([], {
+          'child': refer('Column').newInstance([], {
+            'mainAxisAlignment':
+                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+            'children': literalList([
+              refer('Text').call([
+                literalString(plotTitle)
+              ], {
+                'style': refer('Theme.of')
+                    .call([refer('context')])
+                    .property('textTheme')
+                    .property('headlineLarge')
+              }),
+              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+              refer('Expanded').newInstance([], {'child': lineChart}),
+            ])
+          })
+        }).code,
+      ).closure,
+    }).returned.statement);
+}
+
+Method _generateQuoteSlide(Map<String, dynamic> slide) {
+  final quote = slide['quote'] as String;
+  final attribution = slide['attribution'] as String;
+
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.quote').call([], {
+      'quote': literalString(quote),
+      'attribution': literalString(attribution),
+    }).returned.statement);
+}
+
+Method _generateTableSlide(Map<String, dynamic> slide) {
+  final title = slide['title'] as String;
+  final table = slide['table'] as List<List<String>>;
+  final header = table.first;
+  final rows = table.skip(1).toList();
+  final columns = header
+      .map((cell) => refer('DataColumn')
+          .newInstance([], {'label': refer('Text').call([literalString(cell)])}))
+      .toList();
+  final dataRows = rows.map((row) {
+    final cells = row
+        .map((cell) =>
+            refer('DataCell').newInstance([refer('Text').call([literalString(cell)])]))
+        .toList();
+    return refer('DataRow').newInstance([], {
+      'cells': literalList(cells),
+    });
+  }).toList();
+
+  final tableWidget = refer('DataTable').newInstance([], {
+    'columns': literalList(columns),
+    'rows': literalList(dataRows),
+  });
+
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.blank').call([], {
+      'builder': Method((b) => b
+        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+        ..body = refer('Center').newInstance([], {
+          'child': refer('Column').newInstance([], {
+            'mainAxisAlignment':
+                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+            'children': literalList([
+              refer('Text').call([
+                literalString(title)
+              ], {
+                'style': refer('Theme.of')
+                    .call([refer('context')])
+                    .property('textTheme')
+                    .property('headlineLarge')
+              }),
+              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+              tableWidget,
+            ])
+          })
+        }).code,
+      ).closure,
+    }).returned.statement);
+}
+
+Method _generateFlutterWidgetSlide(Map<String, dynamic> slide) {
+  final title = slide['title'] as String;
+  final flutterWidget = slide['flutterWidget'] as String;
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.blank').call([], {
+      'builder': Method((b) => b
+        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+        ..body = refer('Center').newInstance([], {
+          'child': refer('Column').newInstance([], {
+            'mainAxisAlignment':
+                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+            'children': literalList([
+              refer('Text').call([
+                literalString(title)
+              ], {
+                'style': refer('Theme.of')
+                    .call([refer('context')])
+                    .property('textTheme')
+                    .property('headlineLarge')
+              }),
+              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+              refer('Expanded').newInstance([], {'child': CodeExpression(Code(flutterWidget))}),
+            ])
+          })
+        }).code,
+      ).closure,
+    }).returned.statement);
+}
+
+Method _generateImageSlide(Map<String, dynamic> slide) {
+  final title = slide['title'] as String;
+  final imageUri = slide['imageUri'] as String;
+  var uri = imageUri;
+  var imageWidget = 'Image.asset';
+  if (uri.startsWith('http')) {
+    imageWidget = 'Image.network';
+  } else {
+    if (uri.startsWith('file:')) {
+      uri = uri.replaceFirst('file:', '');
+    }
+    uri = 'assets/images/$uri';
+  }
+  final imageWidth = slide['imageWidth'] as double?;
+  final imageHeight = slide['imageHeight'] as double?;
+  final content = slide['content'] as String;
+
+  if (content.isNotEmpty) {
     return Method((b) => b
       ..name = 'build'
       ..returns = refer('FlutterDeckSlide')
@@ -341,20 +422,22 @@ Method _generateBuildMethod(Map<String, dynamic> slide,
         'builder': Method((b) => b
           ..requiredParameters.add(Parameter((b) => b..name = 'context'))
           ..body = refer('Center').newInstance([], {
-            'child': refer('Column').newInstance([], {
+            'child': refer('Row').newInstance([], {
               'mainAxisAlignment':
                   refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
               'children': literalList([
-                refer('Text').call([
-                  literalString(title)
+                refer(imageWidget).call([
+                  literalString(uri)
                 ], {
-                  'style': refer('Theme.of')
-                      .call([refer('context')])
-                      .property('textTheme')
-                      .property('headlineLarge')
+                  'width': literalNum(imageWidth ?? 0),
+                  'height': literalNum(imageHeight ?? 0),
                 }),
-                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-                refer('Expanded').newInstance([], {'child': CodeExpression(Code(flutterWidget))}),
+                refer('SizedBox').constInstance([], {'width': literalNum(16)}),
+                refer('Text').call([
+                  literalString(content)
+                ], {
+                  'textAlign': refer('TextAlign.center', 'package:flutter/material.dart'),
+                }),
               ])
             })
           }).code,
@@ -362,77 +445,29 @@ Method _generateBuildMethod(Map<String, dynamic> slide,
       }).returned.statement);
   }
 
-  final imageUri = slide['imageUri'] as String?;
-  if (imageUri != null) {
-    var uri = imageUri;
-    var imageWidget = 'Image.asset';
-    if (uri.startsWith('http')) {
-      imageWidget = 'Image.network';
-    } else {
-      if (uri.startsWith('file:')) {
-        uri = uri.replaceFirst('file:', '');
-      }
-      uri = 'assets/images/$uri';
-    }
-    final imageWidth = slide['imageWidth'] as double?;
-    final imageHeight = slide['imageHeight'] as double?;
-    final content = slide['content'] as String;
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.image').call([], {
+      'imageBuilder': Method((b) => b
+        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+        ..body = refer(imageWidget).call([
+          literalString(uri)
+        ], {
+          'width': literalNum(imageWidth ?? 0),
+          'height': literalNum(imageHeight ?? 0),
+        }).code).closure,
+      'label': literalString(title),
+    }).returned.statement);
+}
 
-    if (content.isNotEmpty) {
-      return Method((b) => b
-        ..name = 'build'
-        ..returns = refer('FlutterDeckSlide')
-        ..annotations.add(refer('override'))
-        ..requiredParameters.add(Parameter((b) => b
-          ..name = 'context'
-          ..type = refer('BuildContext')))
-        ..body = refer('FlutterDeckSlide.blank').call([], {
-          'builder': Method((b) => b
-            ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-            ..body = refer('Center').newInstance([], {
-              'child': refer('Row').newInstance([], {
-                'mainAxisAlignment':
-                    refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-                'children': literalList([
-                  refer(imageWidget).call([
-                    literalString(uri)
-                  ], {
-                    'width': literalNum(imageWidth ?? 0),
-                    'height': literalNum(imageHeight ?? 0),
-                  }),
-                  refer('SizedBox').constInstance([], {'width': literalNum(16)}),
-                  refer('Text').call([
-                    literalString(content)
-                  ], {
-                    'textAlign': refer('TextAlign.center', 'package:flutter/material.dart'),
-                  }),
-                ])
-              })
-            }).code,
-          ).closure,
-        }).returned.statement);
-    }
-
-    return Method((b) => b
-      ..name = 'build'
-      ..returns = refer('FlutterDeckSlide')
-      ..annotations.add(refer('override'))
-      ..requiredParameters.add(Parameter((b) => b
-        ..name = 'context'
-        ..type = refer('BuildContext')))
-      ..body = refer('FlutterDeckSlide.image').call([], {
-        'imageBuilder': Method((b) => b
-          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-          ..body = refer(imageWidget).call([
-            literalString(uri)
-          ], {
-            'width': literalNum(imageWidth ?? 0),
-            'height': literalNum(imageHeight ?? 0),
-          }).code).closure,
-        'label': literalString(title),
-      }).returned.statement);
-  }
-
+Method _generateContentSlide(Map<String, dynamic> slide,
+    {bool showAllBullets = false}) {
+  final title = slide['title'] as String;
   final content = slide['content'] as String;
   final contentSteps = slide['content_steps'] as List<String>?;
   final bullets = slide['bullets'] as List<Map<String, dynamic>>;
