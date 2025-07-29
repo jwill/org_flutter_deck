@@ -144,137 +144,143 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 16),
-                Expanded(child:SingleChildScrollView(
-                    child: FlutterDeckSlideStepsBuilder(
-                        builder: (
+                Expanded(
+                    child: SingleChildScrollView(
+                        child: FlutterDeckSlideStepsBuilder(
+                            builder: (
                   context,
                   step,
                 ) =>
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (step > 0) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Display Images',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (step > 0) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Display Images',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              '',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '',
-                                          textAlign: TextAlign.start,
+                                      )
+                                    ],
+                                    if (step > 1) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• System Crafters',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'I haven\'t included these images with the notes so you will have to change the link to another image on your computer!  You can do that with =C-c C-l= (=org-insert-link=) and link to the image without adding a description.\nThis is an image of a computer screen with code on it.\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                            Image.asset(
+                                              'assets/images/photo-1555066931-4365d14bab8c.webp',
+                                              width: 500.0,
+                                              height: 0,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 1) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• System Crafters',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
+                                      )
+                                    ],
+                                    if (step > 2) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Emacs',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              '',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                            Image.asset(
+                                              'assets/images/photo-1605379399642-870262d3d051.webp',
+                                              width: 300.0,
+                                              height: 300.0,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'I haven\'t included these images with the notes so you will have to change the link to another image on your computer!  You can do that with =C-c C-l= (=org-insert-link=) and link to the image without adding a description.\nThis is an image of a computer screen with code on it.\n',
-                                          textAlign: TextAlign.start,
+                                      )
+                                    ],
+                                    if (step > 3) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Run Code Examples',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'This is a terrible code snippet for *example purposes only*!\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                        Image.asset(
-                                          'assets/images/photo-1555066931-4365d14bab8c.webp',
-                                          width: 500.0,
-                                          height: 0,
+                                      )
+                                    ],
+                                    if (step > 4) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Countdown Timer',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Run =org-tree-slide-play-with-timer= to have a countdown timer appear in your modeline.\nGood for keeping track of how much time you have left!\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 2) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Emacs',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          '',
-                                          textAlign: TextAlign.start,
-                                        ),
-                                        Image.asset(
-                                          'assets/images/photo-1605379399642-870262d3d051.webp',
-                                          width: 300.0,
-                                          height: 300.0,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 3) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Run Code Examples',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'This is a terrible code snippet for *example purposes only*!\n',
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 4) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Countdown Timer',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Run =org-tree-slide-play-with-timer= to have a countdown timer appear in your modeline.\nGood for keeping track of how much time you have left!\n',
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ],
-                            )))),
+                                      )
+                                    ],
+                                  ],
+                                )))),
               ],
             )));
   }
@@ -304,83 +310,87 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 16),
-                Expanded(child:SingleChildScrollView(
-                    child: FlutterDeckSlideStepsBuilder(
-                        builder: (
+                Expanded(
+                    child: SingleChildScrollView(
+                        child: FlutterDeckSlideStepsBuilder(
+                            builder: (
                   context,
                   step,
                 ) =>
-                            Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                if (step > 0) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Simple Profile',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
+                                Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    if (step > 0) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Simple Profile',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Run =org-tree-slide-simple-profile=\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Run =org-tree-slide-simple-profile=\n',
-                                          textAlign: TextAlign.start,
+                                      )
+                                    ],
+                                    if (step > 1) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Presentation Profile',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Run =org-tree-slide-presentation-profile=\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 1) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Presentation Profile',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
+                                      )
+                                    ],
+                                    if (step > 2) ...[
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(bottom: 16),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              '• Narrowing Profile',
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .headlineSmall,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              'Run =org-tree-slide-narrowing-control-profile=\n',
+                                              textAlign: TextAlign.start,
+                                            ),
+                                          ],
                                         ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Run =org-tree-slide-presentation-profile=\n',
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                                if (step > 2) ...[
-                                  Padding(padding:
-                                    const EdgeInsets.only(bottom: 16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          '• Narrowing Profile',
-                                          style: Theme.of(context)
-                                              .textTheme
-                                              .headlineSmall,
-                                        ),
-                                        const SizedBox(height: 8),
-                                        Text(
-                                          'Run =org-tree-slide-narrowing-control-profile=\n',
-                                          textAlign: TextAlign.start,
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ],
-                            )))),
+                                      )
+                                    ],
+                                  ],
+                                )))),
               ],
             )));
   }
@@ -410,8 +420,9 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 16),
-                Expanded(child:SingleChildScrollView(
-                    child: FlutterDeckCodeHighlight(
+                Expanded(
+                    child: SingleChildScrollView(
+                        child: FlutterDeckCodeHighlight(
                   code:
                       '\n  (use-package hide-mode-line)\n\n  (defun efs/presentation-setup ()\n    ;; Hide the mode line\n    (hide-mode-line-mode 1)\n\n    ;; Display images inline\n    (org-display-inline-images) ;; Can also use org-startup-with-inline-images\n\n    ;; Scale the text.  The next line is for basic scaling:\n    (setq text-scale-mode-amount 3)\n    (text-scale-mode 1))\n\n    ;; This option is more advanced, allows you to scale other faces too\n    ;; (setq-local face-remapping-alist \'((default (:height 2.0) variable-pitch)\n    ;;                                    (org-verbatim (:height 1.75) org-verbatim)\n    ;;                                    (org-block (:height 1.25) org-block))))\n\n  (defun efs/presentation-end ()\n    ;; Show the mode line again\n    (hide-mode-line-mode 0)\n\n    ;; Turn off text scale mode (or use the next line if you didn\'t use text-scale-mode)\n    ;; (text-scale-mode 0))\n\n    ;; If you use face-remapping-alist, this clears the scaling:\n    (setq-local face-remapping-alist \'((default variable-pitch default))))\n\n  (use-package org-tree-slide\n    :hook ((org-tree-slide-play . efs/presentation-setup)\n           (org-tree-slide-stop . efs/presentation-end))\n    :custom\n    (org-tree-slide-slide-in-effect t)\n    (org-tree-slide-activate-message "Presentation started!")\n    (org-tree-slide-deactivate-message "Presentation finished!")\n    (org-tree-slide-header t)\n    (org-tree-slide-breadcrumbs " > ")\n    (org-image-actual-width nil))\n\n',
                   language: 'emacs-lisp',

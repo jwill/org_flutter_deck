@@ -89,7 +89,7 @@ void main(List<String> args) {
     } else if (line.trim().startsWith('|')) {
       if (plot != null) {
         if (line.trim().startsWith('|-')) {
-          return;
+          continue;
         }
         final cells = line
             .trim()
@@ -536,11 +536,12 @@ Method _generateContentSlide(Map<String, dynamic> slide,
         });
       }
 
-      return refer('Padding').newInstance([
-        refer('EdgeInsets.only').constInstance([], {'bottom': literalNum(16)})
-      ], {
+      return refer('Padding').newInstance([], {
+        'padding':
+            refer('EdgeInsets.only').constInstance([], {'bottom': literalNum(16)}),
         'child': refer('Column').newInstance([], {
-          'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+          'crossAxisAlignment':
+              refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
           'children': literalList([
             refer('Text').call([
               literalString('• $bulletTitle')
@@ -554,7 +555,8 @@ Method _generateContentSlide(Map<String, dynamic> slide,
             refer('Text').call([
               literalString(bulletContent)
             ], {
-              'textAlign': refer('TextAlign.start', 'package:flutter/material.dart'),
+              'textAlign':
+                  refer('TextAlign.start', 'package:flutter/material.dart'),
             }),
             if (imageWidgetStr != literalNull) imageWidgetStr,
           ])
@@ -572,25 +574,27 @@ Method _generateContentSlide(Map<String, dynamic> slide,
         refer('SingleChildScrollView').newInstance([], {'child': column})
       ]);
     } else {
-      contentWidget = refer('Expanded').newInstance([
-        refer('SingleChildScrollView').newInstance([], {
+      contentWidget = refer('Expanded').newInstance([], {
+        'child': refer('SingleChildScrollView').newInstance([], {
           'child': refer('FlutterDeckSlideStepsBuilder').newInstance([], {
             'builder': Method((b) => b
               ..requiredParameters.add(Parameter((b) => b..name = 'context'))
               ..requiredParameters.add(Parameter((b) => b..name = 'step'))
               ..body = refer('Column').newInstance([], {
-                'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+                'crossAxisAlignment': refer(
+                    'CrossAxisAlignment.start', 'package:flutter/material.dart'),
                 'children': literalList(
                   bullets.asMap().entries.map((entry) {
                     final i = entry.key;
-                    return CodeExpression(Code('if (step > $i) ...[ ${bulletWidgets[i].accept(DartEmitter())} ]'));
+                    return CodeExpression(Code(
+                        'if (step > $i) ...[ ${bulletWidgets[i].accept(DartEmitter())} ]'));
                   }).toList(),
                 ),
               }).code,
             ).closure,
           })
         })
-      ]);
+      });
     }
   } else if (code != null) {
     final language = slide['language'] as String?;
@@ -602,9 +606,10 @@ Method _generateContentSlide(Map<String, dynamic> slide,
       'textStyle': refer('GoogleFonts.robotoMono').call([]),
     });
     if (codeLines > 10) {
-      contentWidget = refer('Expanded').newInstance([
-        refer('SingleChildScrollView').newInstance([], {'child': codeHighlight})
-      ]);
+      contentWidget = refer('Expanded').newInstance([], {
+        'child':
+            refer('SingleChildScrollView').newInstance([], {'child': codeHighlight})
+      });
     } else {
       contentWidget = codeHighlight;
     }
