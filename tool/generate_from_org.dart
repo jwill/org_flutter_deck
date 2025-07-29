@@ -268,7 +268,7 @@ Method _generatePlotSlide(Map<String, dynamic> slide) {
             'mainAxisAlignment':
                 refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
             'children': literalList([
-              refer('Text').call([
+              refer('ResponsiveText').call([
                 literalString(plotTitle)
               ], {
                 'style': refer('Theme.of')
@@ -341,7 +341,7 @@ Method _generateTableSlide(Map<String, dynamic> slide) {
             'mainAxisAlignment':
                 refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
             'children': literalList([
-              refer('Text').call([
+              refer('ResponsiveText').call([
                 literalString(title)
               ], {
                 'style': refer('Theme.of')
@@ -376,7 +376,7 @@ Method _generateFlutterWidgetSlide(Map<String, dynamic> slide) {
             'mainAxisAlignment':
                 refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
             'children': literalList([
-              refer('Text').call([
+              refer('ResponsiveText').call([
                 literalString(title)
               ], {
                 'style': refer('Theme.of')
@@ -543,7 +543,7 @@ Method _generateContentSlide(Map<String, dynamic> slide,
           'crossAxisAlignment':
               refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
           'children': literalList([
-            refer('Text').call([
+            refer('ResponsiveText').call([
               literalString('• $bulletTitle')
             ], {
               'style': refer('Theme.of')
@@ -552,7 +552,7 @@ Method _generateContentSlide(Map<String, dynamic> slide,
                   .property('headlineSmall')
             }),
             refer('SizedBox').constInstance([], {'height': literalNum(8)}),
-            refer('Text').call([
+            refer('ResponsiveText').call([
               literalString(bulletContent)
             ], {
               'textAlign':
@@ -629,7 +629,7 @@ Method _generateContentSlide(Map<String, dynamic> slide,
           'child': refer('Column').newInstance([], {
             'mainAxisAlignment': refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
             'children': literalList([
-              refer('Text').call([
+              refer('ResponsiveText').call([
                 literalString(title)
               ], {
                 'style': refer('Theme.of')
@@ -654,6 +654,7 @@ void generateSlidesFile(List<Map<String, dynamic>> slides,
       Directive.import('package:flutter_deck/flutter_deck.dart'),
       Directive.import('package:google_fonts/google_fonts.dart'),
       Directive.import('package:flutter_deck_ai/src/painters.dart'),
+      Directive.import('package:flutter_deck_ai/src/responsive_text.dart'),
       Directive.import('package:fl_chart/fl_chart.dart'),
     ]);
 

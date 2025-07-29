@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_deck/flutter_deck.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter_deck_ai/src/painters.dart';
+import 'package:flutter_deck_ai/src/responsive_text.dart';
 import 'package:fl_chart/fl_chart.dart';
 
 class GeneratedSlide1 extends FlutterDeckSlideWidget {
@@ -24,7 +25,7 @@ class GeneratedSlide1 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Why?',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -71,7 +72,7 @@ class GeneratedSlide2 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'COMMENT This isn\'t shown!',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -104,7 +105,7 @@ class GeneratedSlide3 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Initial Setup',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -139,7 +140,7 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'What Can It Do?',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -162,14 +163,14 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Display Images',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               '',
                                               textAlign: TextAlign.start,
                                             ),
@@ -185,14 +186,14 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• System Crafters',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'I haven\'t included these images with the notes so you will have to change the link to another image on your computer!  You can do that with =C-c C-l= (=org-insert-link=) and link to the image without adding a description.\nThis is an image of a computer screen with code on it.\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -213,14 +214,14 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Emacs',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               '',
                                               textAlign: TextAlign.start,
                                             ),
@@ -241,14 +242,14 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Run Code Examples',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'This is a terrible code snippet for *example purposes only*!\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -264,14 +265,14 @@ class GeneratedSlide4 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Countdown Timer',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'Run =org-tree-slide-play-with-timer= to have a countdown timer appear in your modeline.\nGood for keeping track of how much time you have left!\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -305,7 +306,7 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Profiles',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -328,14 +329,14 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Simple Profile',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'Run =org-tree-slide-simple-profile=\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -351,14 +352,14 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Presentation Profile',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'Run =org-tree-slide-presentation-profile=\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -374,14 +375,14 @@ class GeneratedSlide5 extends FlutterDeckSlideWidget {
                                           crossAxisAlignment:
                                               CrossAxisAlignment.start,
                                           children: [
-                                            Text(
+                                            ResponsiveText(
                                               '• Narrowing Profile',
                                               style: Theme.of(context)
                                                   .textTheme
                                                   .headlineSmall,
                                             ),
                                             const SizedBox(height: 8),
-                                            Text(
+                                            ResponsiveText(
                                               'Run =org-tree-slide-narrowing-control-profile=\n',
                                               textAlign: TextAlign.start,
                                             ),
@@ -415,7 +416,7 @@ class GeneratedSlide6 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Customization',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -452,7 +453,7 @@ class GeneratedSlide7 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Generating a PDF of Slides',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -485,7 +486,7 @@ class GeneratedSlide8 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Flutter Widget Demo',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -519,7 +520,7 @@ class GeneratedSlide9 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Table Demo',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
@@ -593,7 +594,7 @@ class GeneratedSlide11 extends FlutterDeckSlideWidget {
                 child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
+                ResponsiveText(
                   'Sample Line Chart',
                   style: Theme.of(context).textTheme.headlineLarge,
                 ),
