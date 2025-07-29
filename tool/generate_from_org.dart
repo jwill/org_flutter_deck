@@ -1,5 +1,9 @@
 import 'dart:io';
 
+import 'package:code_builder/code_builder.dart';
+import 'package:dart_style/dart_style.dart';
+import 'package:pub_semver/pub_semver.dart';
+
 void main(List<String> args) {
   final showAllBullets = args.contains('--show-all-bullets');
   final transitionIndex = args.indexOf('--transition');
@@ -26,9 +30,11 @@ void main(List<String> args) {
     if (line.startsWith('* ')) {
       if (currentSlide != null) {
         final content = currentSlide['content'] as String;
-        final contentLines = content.split('\n').where((l) => l.trim().startsWith('- ')).toList();
+        final contentLines =
+            content.split('\n').where((l) => l.trim().startsWith('- ')).toList();
         if (contentLines.length > 1) {
-          currentSlide['content_steps'] = contentLines.map((l) => l.trim().substring(2)).toList();
+          currentSlide['content_steps'] =
+              contentLines.map((l) => l.trim().substring(2)).toList();
           currentSlide['content'] = '';
         }
         slides.add(currentSlide);
@@ -71,7 +77,12 @@ void main(List<String> args) {
         if (line.trim().startsWith('|-')) {
           continue;
         }
-        final cells = line.trim().split('|').where((c) => c.isNotEmpty).map((c) => c.trim()).toList();
+        final cells = line
+            .trim()
+            .split('|')
+            .where((c) => c.isNotEmpty)
+            .map((c) => c.trim())
+            .toList();
         (currentSlide['table'] as List<List<String>>).add(cells);
       }
     } else if (line.startsWith('#+begin_src')) {
@@ -120,8 +131,7 @@ void main(List<String> args) {
       if (currentSlide != null) {
         currentSlide['notes'] = '${currentSlide['notes']}$line\n';
       }
-    }
-    else if (line.startsWith('#+ATTR_HTML')) {
+    } else if (line.startsWith('#+ATTR_HTML')) {
       final widthRegex = RegExp(r':width\s+(\d+)');
       final heightRegex = RegExp(r':height\s+(\d+)');
       final widthMatch = widthRegex.firstMatch(line);
@@ -144,111 +154,137 @@ void main(List<String> args) {
       if (lastBullet != null) {
         lastBullet['content'] = '${lastBullet['content']}$line\n';
       } else {
-        currentSlide['content'] =
-            '${currentSlide['content']}$line\n';
+        currentSlide['content'] = '${currentSlide['content']}$line\n';
       }
     }
   }
   if (currentSlide != null) {
     final content = currentSlide['content'] as String;
-    final contentLines = content.split('\n').where((l) => l.trim().startsWith('- ')).toList();
+    final contentLines =
+        content.split('\n').where((l) => l.trim().startsWith('- ')).toList();
     if (contentLines.length > 1) {
-      currentSlide['content_steps'] = contentLines.map((l) => l.trim().substring(2)).toList();
+      currentSlide['content_steps'] =
+          contentLines.map((l) => l.trim().substring(2)).toList();
       currentSlide['content'] = '';
     }
     slides.add(currentSlide);
   }
 
-  generateSlidesFile(slides, showAllBullets: showAllBullets, transition: transition);
+  generateSlidesFile(slides,
+      showAllBullets: showAllBullets, transition: transition);
 }
 
-String _generateBuildMethod(Map<String, dynamic> slide, {bool showAllBullets = false}) {
-  final title = slide['title'] as String;
-  final content = slide['content'] as String;
-  final code = slide['code'] as String?;
-  final language = slide['language'] as String?;
-  final flutterWidget = slide['flutterWidget'] as String?;
-  final imageUri = slide['imageUri'] as String?;
-  final imageWidth = slide['imageWidth'] as double?;
-  final imageHeight = slide['imageHeight'] as double?;
-  final bullets = slide['bullets'] as List<Map<String, dynamic>>;
-  final contentSteps = slide['content_steps'] as List<String>?;
-  final table = slide['table'] as List<List<String>>?;
+Method _generateBuildMethod(Map<String, dynamic> slide,
+    {bool showAllBullets = false}) {
   final quote = slide['quote'] as String?;
   final attribution = slide['attribution'] as String?;
 
   if (quote != null && attribution != null) {
-    return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.quote(
-      quote: """$quote""",
-      attribution: """$attribution""",
-    );
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.quote').call([], {
+        'quote': literalString(quote),
+        'attribution': literalString(attribution),
+      }).returned.statement);
   }
-''';
-  }
+
+  final title = slide['title'] as String;
+  final table = slide['table'] as List<List<String>>?;
 
   if (table != null) {
     final header = table.first;
     final rows = table.skip(1).toList();
-    final columns = header.map((cell) => 'DataColumn(label: Text("$cell"))').join(', ');
-    final dataRows = <String>[];
-    for (final row in rows) {
-      final cells = row.map((cell) => 'DataCell(Text("$cell"))').join(', ');
-      dataRows.add('DataRow(cells: [$cells])');
-    }
-    final tableWidget = '''
-DataTable(
-        columns: [
-          $columns
-        ],
-        rows: [
-          ${dataRows.join(',\n')}
-        ],
-      )
-    ''';
-    return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("""$title""", style: Theme.of(context).textTheme.headlineLarge),
-            const SizedBox(height: 16),
-            $tableWidget,
-          ],
-        ),
-      ),
-    );
-  }
-''';
+    final columns = header
+        .map((cell) => refer('DataColumn')
+            .newInstance([], {'label': refer('Text').call([literalString(cell)])}))
+        .toList();
+    final dataRows = rows.map((row) {
+      final cells = row
+          .map((cell) =>
+              refer('DataCell').newInstance([refer('Text').call([literalString(cell)])]))
+          .toList();
+      return refer('DataRow').newInstance([], {
+        'cells': literalList(cells),
+      });
+    }).toList();
+
+    final tableWidget = refer('DataTable').newInstance([], {
+      'columns': literalList(columns),
+      'rows': literalList(dataRows),
+    });
+
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.blank').call([], {
+        'builder': Method((b) => b
+          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+          ..body = refer('Center').newInstance([], {
+            'child': refer('Column').newInstance([], {
+              'mainAxisAlignment':
+                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+              'children': literalList([
+                refer('Text').call([
+                  literalString(title)
+                ], {
+                  'style': refer('Theme.of')
+                      .call([refer('context')])
+                      .property('textTheme')
+                      .property('headlineLarge')
+                }),
+                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+                tableWidget,
+              ])
+            })
+          }).code,
+        ).closure,
+      }).returned.statement);
   }
 
+  final flutterWidget = slide['flutterWidget'] as String?;
   if (flutterWidget != null) {
-    return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("""$title""", style: Theme.of(context).textTheme.headlineLarge),
-            const SizedBox(height: 16),
-            Expanded(
-              child: $flutterWidget,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-''';
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.blank').call([], {
+        'builder': Method((b) => b
+          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+          ..body = refer('Center').newInstance([], {
+            'child': refer('Column').newInstance([], {
+              'mainAxisAlignment':
+                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+              'children': literalList([
+                refer('Text').call([
+                  literalString(title)
+                ], {
+                  'style': refer('Theme.of')
+                      .call([refer('context')])
+                      .property('textTheme')
+                      .property('headlineLarge')
+                }),
+                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+                refer('Expanded').newInstance([], {'child': CodeExpression(Code(flutterWidget))}),
+              ])
+            })
+          }).code,
+        ).closure,
+      }).returned.statement);
   }
 
+  final imageUri = slide['imageUri'] as String?;
   if (imageUri != null) {
     var uri = imageUri;
     var imageWidget = 'Image.asset';
@@ -260,86 +296,114 @@ DataTable(
       }
       uri = 'assets/images/$uri';
     }
+    final imageWidth = slide['imageWidth'] as double?;
+    final imageHeight = slide['imageHeight'] as double?;
+    final content = slide['content'] as String;
+
     if (content.isNotEmpty) {
-      return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => Center(
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            $imageWidget(
-              """$uri""",
-              width: $imageWidth,
-              height: $imageHeight,
-            ),
-            const SizedBox(width: 16),
-            Text("""$content""", textAlign: TextAlign.center),
-          ],
-        ),
-      ),
-    );
-  }
-''';
+      return Method((b) => b
+        ..name = 'build'
+        ..returns = refer('FlutterDeckSlide')
+        ..annotations.add(refer('override'))
+        ..requiredParameters.add(Parameter((b) => b
+          ..name = 'context'
+          ..type = refer('BuildContext')))
+        ..body = refer('FlutterDeckSlide.blank').call([], {
+          'builder': Method((b) => b
+            ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+            ..body = refer('Center').newInstance([], {
+              'child': refer('Row').newInstance([], {
+                'mainAxisAlignment':
+                    refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+                'children': literalList([
+                  refer(imageWidget).call([
+                    literalString(uri)
+                  ], {
+                    'width': literalNum(imageWidth ?? 0),
+                    'height': literalNum(imageHeight ?? 0),
+                  }),
+                  refer('SizedBox').constInstance([], {'width': literalNum(16)}),
+                  refer('Text').call([
+                    literalString(content)
+                  ], {
+                    'textAlign': refer('TextAlign.center', 'package:flutter/material.dart'),
+                  }),
+                ])
+              })
+            }).code,
+          ).closure,
+        }).returned.statement);
     }
-    return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.image(
-      imageBuilder: (context) => $imageWidget(
-        """$uri""",
-        width: $imageWidth,
-        height: $imageHeight,
-      ),
-      label: """$title""",
-    );
-  }
-''';
+
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.image').call([], {
+        'imageBuilder': Method((b) => b
+          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+          ..body = refer(imageWidget).call([
+            literalString(uri)
+          ], {
+            'width': literalNum(imageWidth ?? 0),
+            'height': literalNum(imageHeight ?? 0),
+          }).code).closure,
+        'label': literalString(title),
+      }).returned.statement);
   }
 
-  var contentWidget =
-      'Text("""$content""", textAlign: TextAlign.center),';
+  final content = slide['content'] as String;
+  final contentSteps = slide['content_steps'] as List<String>?;
+  final bullets = slide['bullets'] as List<Map<String, dynamic>>;
+  final code = slide['code'] as String?;
+
+  var contentWidget = refer('Text').call([
+    literalString(content)
+  ], {
+    'textAlign': refer('TextAlign.center', 'package:flutter/material.dart'),
+  });
+
   if (contentSteps != null && contentSteps.isNotEmpty) {
-    final buffer = StringBuffer();
-    for (var i = 0; i < contentSteps.length; i++) {
-      final stepContent = 'Text("""- ${contentSteps[i]}"""),';
-      if (showAllBullets) {
-        buffer.writeln(stepContent);
-      } else {
-        buffer.writeln('if (step > $i) $stepContent');
-      }
-    }
-    final column = '''
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          ${buffer.toString()}
-        ],
-      )
-    ''';
+    final steps = contentSteps.map((step) =>
+        refer('Text').call([literalString('- $step')])).toList();
+    final column = refer('Column').newInstance([], {
+      'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+      'mainAxisSize': refer('MainAxisSize.min', 'package:flutter/material.dart'),
+      'children': literalList(steps),
+    });
     if (showAllBullets) {
       contentWidget = column;
     } else {
-      contentWidget = '''
-      FlutterDeckSlideStepsBuilder(
-        builder: (context, step) {
-          return $column;
-        },
-      )''';
+      contentWidget = refer('FlutterDeckSlideStepsBuilder').newInstance([], {
+        'builder': Method((b) => b
+          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+          ..requiredParameters.add(Parameter((b) => b..name = 'step'))
+          ..body = refer('Column').newInstance([], {
+            'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+            'mainAxisSize': refer('MainAxisSize.min', 'package:flutter/material.dart'),
+            'children': literalList(
+              contentSteps.asMap().entries.map((entry) {
+                final i = entry.key;
+                final stepContent = entry.value;
+                return CodeExpression(Code('if (step > $i) Text("""- $stepContent""")'));
+              }).toList(),
+            ),
+          }).code,
+        ).closure,
+      });
     }
   } else if (bullets.isNotEmpty) {
-    final buffer = StringBuffer();
-    for (var i = 0; i < bullets.length; i++) {
-      final bullet = bullets[i];
+    final bulletWidgets = bullets.map((bullet) {
       final bulletTitle = bullet['title'] as String;
       final bulletContent = bullet['content'] as String;
       final bulletImageUri = bullet['imageUri'] as String?;
       final bulletImageWidth = bullet['imageWidth'] as double?;
       final bulletImageHeight = bullet['imageHeight'] as double?;
 
-      var imageWidgetStr = '';
+      var imageWidgetStr = literalNull;
       if (bulletImageUri != null) {
         var uri = bulletImageUri;
         var imageWidget = 'Image.asset';
@@ -351,170 +415,204 @@ DataTable(
           }
           uri = 'assets/images/$uri';
         }
-        imageWidgetStr = '''
-        $imageWidget(
-          """$uri""",
-          width: $bulletImageWidth,
-          height: $bulletImageHeight,
-        ),
-        ''';
+        imageWidgetStr = refer(imageWidget).call([
+          literalString(uri)
+        ], {
+          'width': literalNum(bulletImageWidth ?? 0),
+          'height': literalNum(bulletImageHeight ?? 0),
+        });
       }
 
-      final bulletWidgetString = '''
-        Padding(
-          padding: const EdgeInsets.only(bottom: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text("• $bulletTitle", style: Theme.of(context).textTheme.headlineSmall),
-              const SizedBox(height: 8),
-              Text("""$bulletContent""", textAlign: TextAlign.start),
-              $imageWidgetStr
-            ],
-          ),
-        )
-      ''';
+      return refer('Padding').newInstance([
+        refer('EdgeInsets.only').constInstance([], {'bottom': literalNum(16)})
+      ], {
+        'child': refer('Column').newInstance([], {
+          'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+          'children': literalList([
+            refer('Text').call([
+              literalString('• $bulletTitle')
+            ], {
+              'style': refer('Theme.of')
+                  .call([refer('context')])
+                  .property('textTheme')
+                  .property('headlineSmall')
+            }),
+            refer('SizedBox').constInstance([], {'height': literalNum(8)}),
+            refer('Text').call([
+              literalString(bulletContent)
+            ], {
+              'textAlign': refer('TextAlign.start', 'package:flutter/material.dart'),
+            }),
+            if (imageWidgetStr != literalNull) imageWidgetStr,
+          ])
+        })
+      });
+    }).toList();
 
-      if (showAllBullets) {
-        buffer.writeln('$bulletWidgetString,');
-      } else {
-        buffer.writeln('if (step > $i) ...[ $bulletWidgetString, ],');
-      }
-    }
-
-    final column = '''
-      Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          ${buffer.toString()}
-        ],
-      )
-    ''';
+    final column = refer('Column').newInstance([], {
+      'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+      'children': literalList(bulletWidgets),
+    });
 
     if (showAllBullets) {
-      contentWidget = '''
-      Expanded(
-        child: SingleChildScrollView(
-          child: $column,
-        ),
-      )
-      ''';
+      contentWidget = refer('Expanded').newInstance([
+        refer('SingleChildScrollView').newInstance([], {'child': column})
+      ]);
     } else {
-      contentWidget = '''
-      Expanded(
-        child: SingleChildScrollView(
-          child: FlutterDeckSlideStepsBuilder(
-            builder: (context, step) {
-              return $column;
-            },
-          ),
-        ),
-      )
-      ''';
+      contentWidget = refer('Expanded').newInstance([
+        refer('SingleChildScrollView').newInstance([], {
+          'child': refer('FlutterDeckSlideStepsBuilder').newInstance([], {
+            'builder': Method((b) => b
+              ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+              ..requiredParameters.add(Parameter((b) => b..name = 'step'))
+              ..body = refer('Column').newInstance([], {
+                'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+                'children': literalList(
+                  bullets.asMap().entries.map((entry) {
+                    final i = entry.key;
+                    return CodeExpression(Code('if (step > $i) ...[ ${bulletWidgets[i].accept(DartEmitter())} ]'));
+                  }).toList(),
+                ),
+              }).code,
+            ).closure,
+          })
+        })
+      ]);
     }
   } else if (code != null) {
+    final language = slide['language'] as String?;
     final codeLines = code.split('\n').length;
     final codeHighlight =
-        "FlutterDeckCodeHighlight(code: '''$code''', language: '''$language''', textStyle: GoogleFonts.robotoMono(),)";
+        refer('FlutterDeckCodeHighlight').newInstance([], {
+      'code': literalString(code),
+      'language': literalString(language!),
+      'textStyle': refer('GoogleFonts.robotoMono').call([]),
+    });
     if (codeLines > 10) {
-      contentWidget = '''
-Expanded(
-              child: SingleChildScrollView(
-                child: $codeHighlight,
-              ),
-            )''';
+      contentWidget = refer('Expanded').newInstance([
+        refer('SingleChildScrollView').newInstance([], {'child': codeHighlight})
+      ]);
     } else {
       contentWidget = codeHighlight;
     }
   }
 
-  return '''
-  @override
-  FlutterDeckSlide build(BuildContext context) {
-    return FlutterDeckSlide.blank(
-      builder: (context) => Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text("""$title""", style: Theme.of(context).textTheme.headlineLarge),
-            const SizedBox(height: 16),
-            $contentWidget
-          ],
-        ),
-      ),
-    );
-  }
-''';
+  return Method((b) => b
+    ..name = 'build'
+    ..returns = refer('FlutterDeckSlide')
+    ..annotations.add(refer('override'))
+    ..requiredParameters.add(Parameter((b) => b
+      ..name = 'context'
+      ..type = refer('BuildContext')))
+    ..body = refer('FlutterDeckSlide.blank').call([], {
+      'builder': Method((b) => b
+        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+        ..body = refer('Center').newInstance([], {
+          'child': refer('Column').newInstance([], {
+            'mainAxisAlignment': refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+            'children': literalList([
+              refer('Text').call([
+                literalString(title)
+              ], {
+                'style': refer('Theme.of')
+                    .call([refer('context')])
+                    .property('textTheme')
+                    .property('headlineLarge')
+              }),
+              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+              contentWidget,
+            ])
+          })
+        }).code,
+      ).closure,
+    }).returned.statement);
 }
 
+void generateSlidesFile(List<Map<String, dynamic>> slides,
+    {bool showAllBullets = false, String transition = 'none'}) {
+  final library = Library((b) {
+    b.directives.addAll([
+      Directive.import('package:flutter/material.dart'),
+      Directive.import('package:flutter_deck/flutter_deck.dart'),
+      Directive.import('package:google_fonts/google_fonts.dart'),
+      Directive.import('package:flutter_deck_ai/src/painters.dart'),
+    ]);
 
-void generateSlidesFile(List<Map<String, dynamic>> slides, {bool showAllBullets = false, String transition = 'none'}) {
-  final buffer = StringBuffer();
-  buffer.writeln('// ignore_for_file: use_key_in_widget_constructors');
-  buffer.writeln("import 'package:flutter/material.dart';");
-  buffer.writeln("import 'package:flutter_deck/flutter_deck.dart';");
-  buffer.writeln("import 'package:google_fonts/google_fonts.dart';");
-  buffer.writeln("import 'package:flutter_deck_ai/src/painters.dart';");
-  
-  buffer.writeln();
+    for (var i = 0; i < slides.length; i++) {
+      final slide = slides[i];
+      final title = slide['title'] as String;
+      final hidden = slide['hidden'] as bool;
+      final notes = slide['notes'] as String;
+      final bullets = slide['bullets'] as List<Map<String, dynamic>>;
+      final contentSteps = slide['content_steps'] as List<String>? ?? [];
+      var stepsCount =
+          contentSteps.isNotEmpty ? contentSteps.length : bullets.length;
+      if (showAllBullets) {
+        stepsCount = 0;
+      }
+      final className = 'GeneratedSlide${i + 1}';
 
-  for (var i = 0; i < slides.length; i++) {
-    final slide = slides[i];
-    final title = slide['title'] as String;
-    final hidden = slide['hidden'] as bool;
-    final notes = slide['notes'] as String;
-    final bullets = slide['bullets'] as List<Map<String, dynamic>>;
-    final contentSteps = slide['content_steps'] as List<String>? ?? [];
-    var stepsCount = contentSteps.isNotEmpty ? contentSteps.length : bullets.length;
-    if (showAllBullets) {
-      stepsCount = 0;
+      var transitionValue = 'FlutterDeckTransition.none()';
+      switch (transition) {
+        case 'fade':
+          transitionValue = 'FlutterDeckTransition.fade()';
+          break;
+        case 'slide':
+          transitionValue = 'FlutterDeckTransition.slide()';
+          break;
+        case 'scale':
+          transitionValue = 'FlutterDeckTransition.scale()';
+          break;
+        case 'rotation':
+          transitionValue = 'FlutterDeckTransition.rotation()';
+          break;
+      }
+
+      b.body.add(Class((b) => b
+        ..name = className
+        ..extend = refer('FlutterDeckSlideWidget')
+        ..constructors.add(Constructor((b) => b
+          ..constant = true
+          ..initializers.add(refer('super').call([], {
+                'configuration':
+                    refer('FlutterDeckSlideConfiguration').constInstance([], {
+                  'route': literalString('/$className'),
+                  'title': literalString(title),
+                  'hidden': literalBool(hidden),
+                  'steps': literalNum(stepsCount),
+                  'speakerNotes': literalString(notes),
+                  'transition': CodeExpression(Code(transitionValue)),
+                })
+              }).code)))
+        ..methods
+            .add(_generateBuildMethod(slide, showAllBullets: showAllBullets))));
     }
-    final className = 'GeneratedSlide${i + 1}';
 
-    var transitionValue = 'FlutterDeckTransition.none()';
-    switch (transition) {
-      case 'fade':
-        transitionValue = 'FlutterDeckTransition.fade()';
-        break;
-      case 'slide':
-        transitionValue = 'FlutterDeckTransition.slide()';
-        break;
-      case 'scale':
-        transitionValue = 'FlutterDeckTransition.scale()';
-        break;
-      case 'rotation':
-        transitionValue = 'FlutterDeckTransition.rotation()';
-        break;
-    }
+    b.body.add(Field((b) => b
+      ..name = 'generatedSlides'
+      ..modifier = FieldModifier.constant
+      ..assignment = literalList(
+        List.generate(
+            slides.length, (i) => refer('GeneratedSlide${i + 1}').constInstance([])),
+        refer('FlutterDeckSlideWidget'),
+      ).code));
+  });
 
-    buffer.writeln('''
-class $className extends FlutterDeckSlideWidget {
-  const $className()
-      : super(
-          configuration: const FlutterDeckSlideConfiguration(
-            route: '/$className',
-            title: """$title""",
-            hidden: $hidden,
-            steps: $stepsCount,
-            speakerNotes: """$notes""",
-            transition: $transitionValue,
-          ),
-        );
-
-${_generateBuildMethod(slide, showAllBullets: showAllBullets)}
-}
-''');
-  }
-
-  buffer.writeln('const generatedSlides = <FlutterDeckSlideWidget>[');
-  for (var i = 0; i < slides.length; i++) {
-    buffer.writeln('  GeneratedSlide${i + 1}(),');
-  }
-  buffer.writeln('];');
+  final emitter = DartEmitter(useNullSafetySyntax: true);
+  final pubspecContent = File('pubspec.yaml').readAsStringSync();
+  final languageVersionString = RegExp(r'sdk: ">=(\d+\.\d+\.\d+)')
+      .firstMatch(pubspecContent)
+      ?.group(1);
+  final languageVersion = languageVersionString != null
+      ? Version.parse(languageVersionString)
+      : Version.none;
+  final formatter = DartFormatter(
+      pageWidth: 80, languageVersion: languageVersion);
+  final formattedCode =
+      formatter.format(library.accept(emitter).toString());
 
   final outputFile = File('lib/generated_slides.dart');
-  outputFile.writeAsStringSync(buffer.toString());
+  outputFile.writeAsStringSync(formattedCode);
 
   print('Generated lib/generated_slides.dart');
 }
-
