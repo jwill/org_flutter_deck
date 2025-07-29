@@ -477,6 +477,70 @@ class GeneratedSlide8 extends FlutterDeckSlideWidget {
 
 }
 
+class GeneratedSlide9 extends FlutterDeckSlideWidget {
+  const GeneratedSlide9()
+      : super(
+          configuration: const FlutterDeckSlideConfiguration(
+            route: '/GeneratedSlide9',
+            title: """Table Demo""",
+            hidden: false,
+            steps: 0,
+            speakerNotes: """""",
+            transition: FlutterDeckTransition.none(),
+          ),
+        );
+
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.blank(
+      builder: (context) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("""Table Demo""", style: Theme.of(context).textTheme.headlineLarge),
+            const SizedBox(height: 16),
+            DataTable(
+        columns: [
+          DataColumn(label: Text("Name")), DataColumn(label: Text("Age")), DataColumn(label: Text("City"))
+        ],
+        rows: [
+          DataRow(cells: [DataCell(Text("John")), DataCell(Text("30")), DataCell(Text("New York"))]),
+DataRow(cells: [DataCell(Text("Alice")), DataCell(Text("25")), DataCell(Text("London"))]),
+DataRow(cells: [DataCell(Text("Bob")), DataCell(Text("42")), DataCell(Text("Paris"))])
+        ],
+      )
+    ,
+          ],
+        ),
+      ),
+    );
+  }
+
+}
+
+class GeneratedSlide10 extends FlutterDeckSlideWidget {
+  const GeneratedSlide10()
+      : super(
+          configuration: const FlutterDeckSlideConfiguration(
+            route: '/GeneratedSlide10',
+            title: """Quote Demo""",
+            hidden: false,
+            steps: 0,
+            speakerNotes: """""",
+            transition: FlutterDeckTransition.none(),
+          ),
+        );
+
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.quote(
+      quote: """The only way to do great work is to love what you do.""",
+      attribution: """Steve Jobs""",
+    );
+  }
+
+}
+
 const generatedSlides = <FlutterDeckSlideWidget>[
   GeneratedSlide1(),
   GeneratedSlide2(),
@@ -486,4 +550,6 @@ const generatedSlides = <FlutterDeckSlideWidget>[
   GeneratedSlide6(),
   GeneratedSlide7(),
   GeneratedSlide8(),
+  GeneratedSlide9(),
+  GeneratedSlide10(),
 ];

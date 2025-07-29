@@ -15,9 +15,11 @@ void main(List<String> args) {
   var inCodeBlock = false;
   var inNotesDrawer = false;
   var inFlutterBlock = false;
+  var inQuoteBlock = false;
   var codeBlockContent = '';
   var codeBlockLanguage = '';
   var flutterBlockContent = '';
+  var quoteBlockContent = '';
   Map<String, dynamic>? lastBullet;
 
   for (final line in lines) {
@@ -44,6 +46,9 @@ void main(List<String> args) {
         'imageWidth': null,
         'imageHeight': null,
         'bullets': <Map<String, dynamic>>[],
+        'table': null,
+        'quote': null,
+        'attribution': null,
       };
       lastBullet = null;
     } else if (line.startsWith('** ') || line.startsWith('*** ')) {
@@ -57,6 +62,17 @@ void main(List<String> args) {
           'imageHeight': null,
         };
         (currentSlide['bullets'] as List<Map<String, dynamic>>).add(lastBullet);
+      }
+    } else if (line.trim().startsWith('|')) {
+      if (currentSlide != null) {
+        if (currentSlide['table'] == null) {
+          currentSlide['table'] = <List<String>>[];
+        }
+        if (line.trim().startsWith('|-')) {
+          continue;
+        }
+        final cells = line.trim().split('|').where((c) => c.isNotEmpty).map((c) => c.trim()).toList();
+        (currentSlide['table'] as List<List<String>>).add(cells);
       }
     } else if (line.startsWith('#+begin_src')) {
       inCodeBlock = true;
@@ -81,6 +97,21 @@ void main(List<String> args) {
       }
     } else if (inFlutterBlock) {
       flutterBlockContent += '$line\n';
+    } else if (line.startsWith('#+BEGIN_QUOTE')) {
+      inQuoteBlock = true;
+      quoteBlockContent = '';
+    } else if (line.startsWith('#+END_QUOTE')) {
+      inQuoteBlock = false;
+      if (currentSlide != null) {
+        final quoteLines = quoteBlockContent.trim().split('\n');
+        final attribution = quoteLines.last.startsWith('- ')
+            ? quoteLines.removeLast().substring(2).trim()
+            : '';
+        currentSlide['quote'] = quoteLines.join('\n');
+        currentSlide['attribution'] = attribution;
+      }
+    } else if (inQuoteBlock) {
+      quoteBlockContent += '$line\n';
     } else if (line.trim() == ':NOTES:') {
       inNotesDrawer = true;
     } else if (line.trim() == ':END:') {
@@ -142,6 +173,59 @@ String _generateBuildMethod(Map<String, dynamic> slide, {bool showAllBullets = f
   final imageHeight = slide['imageHeight'] as double?;
   final bullets = slide['bullets'] as List<Map<String, dynamic>>;
   final contentSteps = slide['content_steps'] as List<String>?;
+  final table = slide['table'] as List<List<String>>?;
+  final quote = slide['quote'] as String?;
+  final attribution = slide['attribution'] as String?;
+
+  if (quote != null && attribution != null) {
+    return '''
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.quote(
+      quote: """$quote""",
+      attribution: """$attribution""",
+    );
+  }
+''';
+  }
+
+  if (table != null) {
+    final header = table.first;
+    final rows = table.skip(1).toList();
+    final columns = header.map((cell) => 'DataColumn(label: Text("$cell"))').join(', ');
+    final dataRows = <String>[];
+    for (final row in rows) {
+      final cells = row.map((cell) => 'DataCell(Text("$cell"))').join(', ');
+      dataRows.add('DataRow(cells: [$cells])');
+    }
+    final tableWidget = '''
+DataTable(
+        columns: [
+          $columns
+        ],
+        rows: [
+          ${dataRows.join(',\n')}
+        ],
+      )
+    ''';
+    return '''
+  @override
+  FlutterDeckSlide build(BuildContext context) {
+    return FlutterDeckSlide.blank(
+      builder: (context) => Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text("""$title""", style: Theme.of(context).textTheme.headlineLarge),
+            const SizedBox(height: 16),
+            $tableWidget,
+          ],
+        ),
+      ),
+    );
+  }
+''';
+  }
 
   if (flutterWidget != null) {
     return '''

@@ -147,3 +147,18 @@ CustomPaint(
 )
 #+END_FLUTTER
 
+* Table Demo
+
+| Name  | Age | City      |
+|-------+-----+-----------|
+| John  | 30  | New York  |
+| Alice | 25  | London    |
+| Bob   | 42  | Paris     |
+
+* Quote Demo
+
+#+BEGIN_QUOTE
+The only way to do great work is to love what you do.
+- Steve Jobs
+#+END_QUOTE
+

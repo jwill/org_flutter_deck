@@ -115,6 +115,33 @@ CustomPaint(
 #+END_FLUTTER
 ```
 
+### Tables
+
+You can create tables using Org Mode's table syntax. The first row will be treated as the header.
+
+```org
+* Slide with a Table
+
+| Name  | Age | City      |
+|-------+-----+-----------|
+| John  | 30  | New York  |
+| Alice | 25  | London    |
+| Bob   | 42  | Paris     |
+```
+
+### Quotes
+
+You can add a quote to a slide using a `#+BEGIN_QUOTE` block. The last line starting with `- ` will be used as the attribution.
+
+```org
+* Slide with a Quote
+
+#+BEGIN_QUOTE
+The only way to do great work is to love what you do.
+- Steve Jobs
+#+END_QUOTE
+```
+
 ### Images
 
 You can add images to slides. Both local and remote images are supported.
