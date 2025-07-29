@@ -25,6 +25,7 @@ void main(List<String> args) {
   var flutterBlockContent = '';
   var quoteBlockContent = '';
   Map<String, dynamic>? lastBullet;
+  Map<String, dynamic>? plot;
 
   for (final line in lines) {
     if (line.startsWith('* ')) {
@@ -55,8 +56,24 @@ void main(List<String> args) {
         'table': null,
         'quote': null,
         'attribution': null,
+        'plot': null,
       };
       lastBullet = null;
+      plot = null;
+    } else if (line.startsWith('#+PLOT:')) {
+      final plotOptions = line.substring(7).trim();
+      final titleMatch = RegExp(r'title:"(.*?)"').firstMatch(plotOptions);
+      final typeMatch = RegExp(r'type:(.*?)(?:\s|$)').firstMatch(plotOptions);
+      final withMatch = RegExp(r'with:(.*?)(?:\s|$)').firstMatch(plotOptions);
+      plot = {
+        'title': titleMatch?.group(1) ?? '',
+        'type': typeMatch?.group(1) ?? '2d',
+        'with': withMatch?.group(1) ?? 'lines',
+        'data': <List<String>>[],
+      };
+      if (currentSlide != null) {
+        currentSlide['plot'] = plot;
+      }
     } else if (line.startsWith('** ') || line.startsWith('*** ')) {
       if (currentSlide != null) {
         final level = line.startsWith('***') ? 3 : 2;
@@ -70,7 +87,18 @@ void main(List<String> args) {
         (currentSlide['bullets'] as List<Map<String, dynamic>>).add(lastBullet);
       }
     } else if (line.trim().startsWith('|')) {
-      if (currentSlide != null) {
+      if (plot != null) {
+        if (line.trim().startsWith('|-')) {
+          return;
+        }
+        final cells = line
+            .trim()
+            .split('|')
+            .where((c) => c.isNotEmpty)
+            .map((c) => c.trim())
+            .toList();
+        (plot['data'] as List<List<String>>).add(cells);
+      } else if (currentSlide != null) {
         if (currentSlide['table'] == null) {
           currentSlide['table'] = <List<String>>[];
         }
@@ -176,6 +204,56 @@ void main(List<String> args) {
 
 Method _generateBuildMethod(Map<String, dynamic> slide,
     {bool showAllBullets = false}) {
+  final plot = slide['plot'] as Map<String, dynamic>?;
+  if (plot != null) {
+    final plotTitle = plot['title'] as String;
+    final data = plot['data'] as List<List<String>>;
+    final spots = data.skip(1).map((row) {
+      final x = double.tryParse(row[0]) ?? 0.0;
+      final y = double.tryParse(row[1]) ?? 0.0;
+      return refer('FlSpot').newInstance([literalNum(x), literalNum(y)]);
+    }).toList();
+    final lineChart = refer('LineChart').newInstance([
+      refer('LineChartData').newInstance([], {
+        'lineBarsData': literalList([
+          refer('LineChartBarData').newInstance([], {
+            'spots': literalList(spots),
+          })
+        ]),
+      })
+    ]);
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.blank').call([], {
+        'builder': Method((b) => b
+          ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+          ..body = refer('Center').newInstance([], {
+            'child': refer('Column').newInstance([], {
+              'mainAxisAlignment':
+                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+              'children': literalList([
+                refer('Text').call([
+                  literalString(plotTitle)
+                ], {
+                  'style': refer('Theme.of')
+                      .call([refer('context')])
+                      .property('textTheme')
+                      .property('headlineLarge')
+                }),
+                refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+                refer('Expanded').newInstance([], {'child': lineChart}),
+              ])
+            })
+          }).code,
+        ).closure,
+      }).returned.statement);
+  }
+
   final quote = slide['quote'] as String?;
   final attribution = slide['attribution'] as String?;
 
@@ -536,6 +614,7 @@ void generateSlidesFile(List<Map<String, dynamic>> slides,
       Directive.import('package:flutter_deck/flutter_deck.dart'),
       Directive.import('package:google_fonts/google_fonts.dart'),
       Directive.import('package:flutter_deck_ai/src/painters.dart'),
+      Directive.import('package:fl_chart/fl_chart.dart'),
     ]);
 
     for (var i = 0; i < slides.length; i++) {
@@ -600,9 +679,7 @@ void generateSlidesFile(List<Map<String, dynamic>> slides,
 
   final emitter = DartEmitter(useNullSafetySyntax: true);
   final pubspecContent = File('pubspec.yaml').readAsStringSync();
-  final languageVersionString = RegExp(r'sdk: ">=(\d+\.\d+\.\d+)')
-      .firstMatch(pubspecContent)
-      ?.group(1);
+  final languageVersionString = RegExp(r'sdk: ">=(\d+\.\d+\.\d+)').firstMatch(pubspecContent)?.group(1);
   final languageVersion = languageVersionString != null
       ? Version.parse(languageVersionString)
       : Version.none;
