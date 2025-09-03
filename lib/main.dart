@@ -15,6 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FlutterDeckApp(
+      speakerInfo: speakerInfo,
       slides: generatedSlides,
       client: FlutterDeckWsClient(
         uri: Uri.parse('ws://localhost:53837'),

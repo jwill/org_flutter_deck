@@ -571,12 +571,17 @@ Method _generateImageSlide(Map<String, dynamic> slide, {String? template}) {
         'mainAxisAlignment':
             refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
         'children': literalList([
-          refer(imageWidget).call([
-            literalString(uri)
-          ], {
-            'width': literalNum(imageWidth ?? 0),
-            'height': literalNum(imageHeight ?? 0),
-          }),
+          refer('Expanded').newInstance(
+            [],
+            {
+              'child': refer(imageWidget).call([
+                literalString(uri)
+              ], {
+                'width': literalNum(imageWidth ?? 0),
+                'height': literalNum(imageHeight ?? 0),
+              })
+            },
+          ),
           refer('SizedBox').constInstance([], {'width': literalNum(16)}),
           refer('Text').call([
             literalString(content)
@@ -689,12 +694,17 @@ Method _generateContentSlide(
           }
           uri = 'assets/images/$uri';
         }
-        imageWidgetStr = refer(imageWidget).call([
-          literalString(uri)
-        ], {
-          'width': literalNum(bulletImageWidth ?? 0),
-          'height': literalNum(bulletImageHeight ?? 0),
-        });
+        imageWidgetStr = refer('Expanded').newInstance(
+          [],
+          {
+            'child': refer(imageWidget).call([
+              literalString(uri)
+            ], {
+              'width': literalNum(bulletImageWidth ?? 0),
+              'height': literalNum(bulletImageHeight ?? 0),
+            })
+          },
+        );
       }
 
       return refer('Padding').newInstance([], {
