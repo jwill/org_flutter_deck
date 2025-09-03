@@ -16,6 +16,14 @@ void main(List<String> args) {
   if (templateIndex != -1 && templateIndex + 1 < args.length) {
     template = args[templateIndex + 1];
   }
+  final importsFileIndex = args.indexOf('--imports-file');
+  List<String> imports = [];
+  if (importsFileIndex != -1 && importsFileIndex + 1 < args.length) {
+    final file = File(args[importsFileIndex + 1]);
+    if (file.existsSync()) {
+      imports = file.readAsLinesSync();
+    }
+  }
   final orgFile = File(args.firstWhere((arg) => arg.endsWith('.org'),
       orElse: () => 'demo-slide-deck.org'));
   final lines = orgFile.readAsLinesSync();
@@ -219,6 +227,7 @@ void main(List<String> args) {
     showAllBullets: showAllBullets,
     transition: transition,
     template: template,
+    imports: imports,
   );
 }
 
@@ -843,6 +852,7 @@ void generateSlidesFile(
   bool showAllBullets = false,
   String transition = 'none',
   String? template,
+  List<String> imports = const [],
 }) {
   final library = Library((b) {
     b.directives.addAll([
@@ -850,6 +860,7 @@ void generateSlidesFile(
       Directive.import('package:flutter_deck/flutter_deck.dart'),
       Directive.import('package:google_fonts/google_fonts.dart'),
       Directive.import('package:dash_summit_talk/responsive_text.dart'),
+      ...imports.map((import) => Directive.import(import)),
     ]);
 
     for (var i = 0; i < slides.length; i++) {

@@ -21,6 +21,8 @@ This will read `demo-slide-deck.org` and generate `lib/generated_slides.dart`.
   - `slide`
   - `scale`
   - `rotation`
+- `--template <ClassName>`: Specify a template class to use for the slides. This class will wrap the content of each slide, allowing for custom layouts and branding. The template class must be a `FlutterDeckSlideWidget`.
+- `--imports-file <path>`: Specify a file containing a list of import statements to be added to the generated slides file. Each line in the file should be a valid import statement.
 
 ## Slide Deck Structure (Org Mode)
 
