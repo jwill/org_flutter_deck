@@ -11,7 +11,13 @@ void main(List<String> args) {
   if (transitionIndex != -1 && transitionIndex + 1 < args.length) {
     transition = args[transitionIndex + 1];
   }
-  final orgFile = File(args.firstWhere((arg) => arg.endsWith('.org'), orElse: () => 'demo-slide-deck.org'));
+  final templateIndex = args.indexOf('--template');
+  String? template;
+  if (templateIndex != -1 && templateIndex + 1 < args.length) {
+    template = args[templateIndex + 1];
+  }
+  final orgFile = File(args.firstWhere((arg) => arg.endsWith('.org'),
+      orElse: () => 'demo-slide-deck.org'));
   final lines = orgFile.readAsLinesSync();
 
   String? author;
@@ -212,43 +218,48 @@ void main(List<String> args) {
     author: author,
     showAllBullets: showAllBullets,
     transition: transition,
+    template: template,
   );
 }
 
-Method _generateBuildMethod(Map<String, dynamic> slide,
-    {bool showAllBullets = false}) {
+Method _generateBuildMethod(
+  Map<String, dynamic> slide, {
+  bool showAllBullets = false,
+  String? template,
+}) {
   final plot = slide['plot'] as Map<String, dynamic>?;
   if (plot != null) {
-    return _generatePlotSlide(slide);
+    return _generatePlotSlide(slide, template: template);
   }
 
   final quote = slide['quote'] as String?;
   final attribution = slide['attribution'] as String?;
 
   if (quote != null && attribution != null) {
-    return _generateQuoteSlide(slide);
+    return _generateQuoteSlide(slide, template: template);
   }
 
   final table = slide['table'] as List<List<String>>?;
 
   if (table != null) {
-    return _generateTableSlide(slide);
+    return _generateTableSlide(slide, template: template);
   }
 
   final flutterWidget = slide['flutterWidget'] as String?;
   if (flutterWidget != null) {
-    return _generateFlutterWidgetSlide(slide);
+    return _generateFlutterWidgetSlide(slide, template: template);
   }
 
   final imageUri = slide['imageUri'] as String?;
   if (imageUri != null) {
-    return _generateImageSlide(slide);
+    return _generateImageSlide(slide, template: template);
   }
 
-  return _generateContentSlide(slide, showAllBullets: showAllBullets);
+  return _generateContentSlide(slide,
+      showAllBullets: showAllBullets, template: template);
 }
 
-Method _generatePlotSlide(Map<String, dynamic> slide) {
+Method _generatePlotSlide(Map<String, dynamic> slide, {String? template}) {
   final plot = slide['plot'] as Map<String, dynamic>;
   final plotTitle = plot['title'] as String;
   final data = plot['data'] as List<List<String>>;
@@ -266,6 +277,48 @@ Method _generatePlotSlide(Map<String, dynamic> slide) {
       ]),
     })
   ]);
+
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Column').newInstance([], {
+        'mainAxisAlignment':
+            refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer('ResponsiveText').call([
+            literalString(plotTitle)
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineLarge')
+          }),
+          refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+          refer('Expanded').newInstance([], {'child': lineChart}),
+        ])
+      })
+    }).code);
+
+  final Code body;
+  if (template != null) {
+    body = refer(template)
+        .newInstance([], {
+          'configuration': refer('configuration'),
+          'contentBuilder': builder.closure,
+        })
+        .property('build')
+        .call([refer('context')])
+        .returned
+        .statement;
+  } else {
+    body = refer('FlutterDeckSlide.blank')
+        .call([], {
+          'builder': builder.closure,
+        })
+        .returned
+        .statement;
+  }
+
   return Method((b) => b
     ..name = 'build'
     ..returns = refer('FlutterDeckSlide')
@@ -273,35 +326,64 @@ Method _generatePlotSlide(Map<String, dynamic> slide) {
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.blank').call([], {
-      'builder': Method((b) => b
-        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-        ..body = refer('Center').newInstance([], {
-          'child': refer('Column').newInstance([], {
-            'mainAxisAlignment':
-                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-            'children': literalList([
-              refer('ResponsiveText').call([
-                literalString(plotTitle)
-              ], {
-                'style': refer('Theme.of')
-                    .call([refer('context')])
-                    .property('textTheme')
-                    .property('headlineLarge')
-              }),
-              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-              refer('Expanded').newInstance([], {'child': lineChart}),
-            ])
-          })
-        }).code,
-      ).closure,
-    }).returned.statement);
+    ..body = body);
 }
 
-Method _generateQuoteSlide(Map<String, dynamic> slide) {
+Method _generateQuoteSlide(Map<String, dynamic> slide, {String? template}) {
   final quote = slide['quote'] as String;
   final attribution = slide['attribution'] as String;
 
+  if (template == null) {
+    return Method((b) => b
+      ..name = 'build'
+      ..returns = refer('FlutterDeckSlide')
+      ..annotations.add(refer('override'))
+      ..requiredParameters.add(Parameter((b) => b
+        ..name = 'context'
+        ..type = refer('BuildContext')))
+      ..body = refer('FlutterDeckSlide.quote').call([], {
+        'quote': literalString(quote),
+        'attribution': literalString(attribution),
+      }).returned.statement);
+  }
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Column').newInstance([], {
+        'mainAxisAlignment': refer(
+            'MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer('Text').call([
+            literalString(quote)
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineMedium')
+          }),
+          refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+          refer('Text').call([
+            literalString('- $attribution')
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineSmall')
+          }),
+        ])
+      })
+    }).code);
+
+  final body = refer(template)
+      .newInstance([], {
+        'configuration': refer('configuration'),
+        'contentBuilder': builder.closure,
+      })
+      .property('build')
+      .call([refer('context')])
+      .returned
+      .statement;
+
   return Method((b) => b
     ..name = 'build'
     ..returns = refer('FlutterDeckSlide')
@@ -309,13 +391,10 @@ Method _generateQuoteSlide(Map<String, dynamic> slide) {
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.quote').call([], {
-      'quote': literalString(quote),
-      'attribution': literalString(attribution),
-    }).returned.statement);
+    ..body = body);
 }
 
-Method _generateTableSlide(Map<String, dynamic> slide) {
+Method _generateTableSlide(Map<String, dynamic> slide, {String? template}) {
   final title = slide['title'] as String;
   final table = slide['table'] as List<List<String>>;
   final header = table.first;
@@ -339,6 +418,47 @@ Method _generateTableSlide(Map<String, dynamic> slide) {
     'rows': literalList(dataRows),
   });
 
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Column').newInstance([], {
+        'mainAxisAlignment':
+            refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer('ResponsiveText').call([
+            literalString(title)
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineLarge')
+          }),
+          refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+          tableWidget,
+        ])
+      })
+    }).code);
+
+  final Code body;
+  if (template != null) {
+    body = refer(template)
+        .newInstance([], {
+          'configuration': refer('configuration'),
+          'contentBuilder': builder.closure,
+        })
+        .property('build')
+        .call([refer('context')])
+        .returned
+        .statement;
+  } else {
+    body = refer('FlutterDeckSlide.blank')
+        .call([], {
+          'builder': builder.closure,
+        })
+        .returned
+        .statement;
+  }
+
   return Method((b) => b
     ..name = 'build'
     ..returns = refer('FlutterDeckSlide')
@@ -346,34 +466,56 @@ Method _generateTableSlide(Map<String, dynamic> slide) {
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.blank').call([], {
-      'builder': Method((b) => b
-        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-        ..body = refer('Center').newInstance([], {
-          'child': refer('Column').newInstance([], {
-            'mainAxisAlignment':
-                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-            'children': literalList([
-              refer('ResponsiveText').call([
-                literalString(title)
-              ], {
-                'style': refer('Theme.of')
-                    .call([refer('context')])
-                    .property('textTheme')
-                    .property('headlineLarge')
-              }),
-              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-              tableWidget,
-            ])
-          })
-        }).code,
-      ).closure,
-    }).returned.statement);
+    ..body = body);
 }
 
-Method _generateFlutterWidgetSlide(Map<String, dynamic> slide) {
+Method _generateFlutterWidgetSlide(Map<String, dynamic> slide,
+    {String? template}) {
   final title = slide['title'] as String;
   final flutterWidget = slide['flutterWidget'] as String;
+
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Column').newInstance([], {
+        'mainAxisAlignment':
+            refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer('ResponsiveText').call([
+            literalString(title)
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineLarge')
+          }),
+          refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+          refer('Expanded')
+              .newInstance([], {'child': CodeExpression(Code(flutterWidget))}),
+        ])
+      })
+    }).code);
+
+  final Code body;
+  if (template != null) {
+    body = refer(template)
+        .newInstance([], {
+          'configuration': refer('configuration'),
+          'contentBuilder': builder.closure,
+        })
+        .property('build')
+        .call([refer('context')])
+        .returned
+        .statement;
+  } else {
+    body = refer('FlutterDeckSlide.blank')
+        .call([], {
+          'builder': builder.closure,
+        })
+        .returned
+        .statement;
+  }
+
   return Method((b) => b
     ..name = 'build'
     ..returns = refer('FlutterDeckSlide')
@@ -381,32 +523,10 @@ Method _generateFlutterWidgetSlide(Map<String, dynamic> slide) {
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.blank').call([], {
-      'builder': Method((b) => b
-        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-        ..body = refer('Center').newInstance([], {
-          'child': refer('Column').newInstance([], {
-            'mainAxisAlignment':
-                refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-            'children': literalList([
-              refer('ResponsiveText').call([
-                literalString(title)
-              ], {
-                'style': refer('Theme.of')
-                    .call([refer('context')])
-                    .property('textTheme')
-                    .property('headlineLarge')
-              }),
-              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-              refer('Expanded').newInstance([], {'child': CodeExpression(Code(flutterWidget))}),
-            ])
-          })
-        }).code,
-      ).closure,
-    }).returned.statement);
+    ..body = body);
 }
 
-Method _generateImageSlide(Map<String, dynamic> slide) {
+Method _generateImageSlide(Map<String, dynamic> slide, {String? template}) {
   final title = slide['title'] as String;
   final imageUri = slide['imageUri'] as String;
   var uri = imageUri;
@@ -423,7 +543,7 @@ Method _generateImageSlide(Map<String, dynamic> slide) {
   final imageHeight = slide['imageHeight'] as double?;
   final content = slide['content'] as String;
 
-  if (content.isNotEmpty) {
+  if (template == null && content.isEmpty) {
     return Method((b) => b
       ..name = 'build'
       ..returns = refer('FlutterDeckSlide')
@@ -431,31 +551,61 @@ Method _generateImageSlide(Map<String, dynamic> slide) {
       ..requiredParameters.add(Parameter((b) => b
         ..name = 'context'
         ..type = refer('BuildContext')))
-      ..body = refer('FlutterDeckSlide.blank').call([], {
-        'builder': Method((b) => b
+      ..body = refer('FlutterDeckSlide.image').call([], {
+        'imageBuilder': Method((b) => b
           ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-          ..body = refer('Center').newInstance([], {
-            'child': refer('Row').newInstance([], {
-              'mainAxisAlignment':
-                  refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-              'children': literalList([
-                refer(imageWidget).call([
-                  literalString(uri)
-                ], {
-                  'width': literalNum(imageWidth ?? 0),
-                  'height': literalNum(imageHeight ?? 0),
-                }),
-                refer('SizedBox').constInstance([], {'width': literalNum(16)}),
-                refer('Text').call([
-                  literalString(content)
-                ], {
-                  'textAlign': refer('TextAlign.center', 'package:flutter/material.dart'),
-                }),
-              ])
-            })
-          }).code,
-        ).closure,
+          ..body = refer(imageWidget).call([
+            literalString(uri)
+          ], {
+            'width': literalNum(imageWidth ?? 0),
+            'height': literalNum(imageHeight ?? 0),
+          }).code).closure,
+        'label': literalString(title),
       }).returned.statement);
+  }
+
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Row').newInstance([], {
+        'mainAxisAlignment':
+            refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer(imageWidget).call([
+            literalString(uri)
+          ], {
+            'width': literalNum(imageWidth ?? 0),
+            'height': literalNum(imageHeight ?? 0),
+          }),
+          refer('SizedBox').constInstance([], {'width': literalNum(16)}),
+          refer('Text').call([
+            literalString(content)
+          ], {
+            'textAlign':
+                refer('TextAlign.center', 'package:flutter/material.dart'),
+          }),
+        ])
+      })
+    }).code);
+
+  final Code body;
+  if (template != null) {
+    body = refer(template)
+        .newInstance([], {
+          'configuration': refer('configuration'),
+          'contentBuilder': builder.closure,
+        })
+        .property('build')
+        .call([refer('context')])
+        .returned
+        .statement;
+  } else {
+    body = refer('FlutterDeckSlide.blank')
+        .call([], {
+          'builder': builder.closure,
+        })
+        .returned
+        .statement;
   }
 
   return Method((b) => b
@@ -465,21 +615,14 @@ Method _generateImageSlide(Map<String, dynamic> slide) {
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.image').call([], {
-      'imageBuilder': Method((b) => b
-        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-        ..body = refer(imageWidget).call([
-          literalString(uri)
-        ], {
-          'width': literalNum(imageWidth ?? 0),
-          'height': literalNum(imageHeight ?? 0),
-        }).code).closure,
-      'label': literalString(title),
-    }).returned.statement);
+    ..body = body);
 }
 
-Method _generateContentSlide(Map<String, dynamic> slide,
-    {bool showAllBullets = false}) {
+Method _generateContentSlide(
+  Map<String, dynamic> slide, {
+  bool showAllBullets = false,
+  String? template,
+}) {
   final title = slide['title'] as String;
   final content = slide['content'] as String;
   final contentSteps = slide['content_steps'] as List<String>?;
@@ -493,10 +636,12 @@ Method _generateContentSlide(Map<String, dynamic> slide,
   });
 
   if (contentSteps != null && contentSteps.isNotEmpty) {
-    final steps = contentSteps.map((step) =>
-        refer('Text').call([literalString('- $step')])).toList();
+    final steps = contentSteps
+        .map((step) => refer('Text').call([literalString('- $step')]))
+        .toList();
     final column = refer('Column').newInstance([], {
-      'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+      'crossAxisAlignment':
+          refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
       'mainAxisSize': refer('MainAxisSize.min', 'package:flutter/material.dart'),
       'children': literalList(steps),
     });
@@ -508,13 +653,16 @@ Method _generateContentSlide(Map<String, dynamic> slide,
           ..requiredParameters.add(Parameter((b) => b..name = 'context'))
           ..requiredParameters.add(Parameter((b) => b..name = 'step'))
           ..body = refer('Column').newInstance([], {
-            'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
-            'mainAxisSize': refer('MainAxisSize.min', 'package:flutter/material.dart'),
+            'crossAxisAlignment': refer(
+                'CrossAxisAlignment.start', 'package:flutter/material.dart'),
+            'mainAxisSize':
+                refer('MainAxisSize.min', 'package:flutter/material.dart'),
             'children': literalList(
               contentSteps.asMap().entries.map((entry) {
                 final i = entry.key;
                 final stepContent = entry.value;
-                return CodeExpression(Code('if (step > $i) Text("""- $stepContent""")'));
+                return CodeExpression(
+                    Code('if (step > $i) Text("""- $stepContent""")'));
               }).toList(),
             ),
           }).code,
@@ -578,7 +726,8 @@ Method _generateContentSlide(Map<String, dynamic> slide,
     }).toList();
 
     final column = refer('Column').newInstance([], {
-      'crossAxisAlignment': refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
+      'crossAxisAlignment':
+          refer('CrossAxisAlignment.start', 'package:flutter/material.dart'),
       'children': literalList(bulletWidgets),
     });
 
@@ -612,8 +761,7 @@ Method _generateContentSlide(Map<String, dynamic> slide,
   } else if (code != null) {
     final language = slide['language'] as String?;
     final codeLines = code.split('\n').length;
-    final codeHighlight =
-        refer('FlutterDeckCodeHighlight').newInstance([], {
+    final codeHighlight = refer('FlutterDeckCodeHighlight').newInstance([], {
       'code': literalString(code),
       'language': literalString(language!),
       'textStyle': refer('GoogleFonts.robotoMono').call([]),
@@ -628,6 +776,47 @@ Method _generateContentSlide(Map<String, dynamic> slide,
     }
   }
 
+  final builder = Method((b) => b
+    ..requiredParameters.add(Parameter((b) => b..name = 'context'))
+    ..body = refer('Center').newInstance([], {
+      'child': refer('Column').newInstance([], {
+        'mainAxisAlignment':
+            refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
+        'children': literalList([
+          refer('ResponsiveText').call([
+            literalString(title)
+          ], {
+            'style': refer('Theme.of')
+                .call([refer('context')])
+                .property('textTheme')
+                .property('headlineLarge')
+          }),
+          refer('SizedBox').constInstance([], {'height': literalNum(16)}),
+          contentWidget,
+        ])
+      })
+    }).code);
+
+  final Code body;
+  if (template != null) {
+    body = refer(template)
+        .newInstance([], {
+          'configuration': refer('configuration'),
+          'contentBuilder': builder.closure,
+        })
+        .property('build')
+        .call([refer('context')])
+        .returned
+        .statement;
+  } else {
+    body = refer('FlutterDeckSlide.blank')
+        .call([], {
+          'builder': builder.closure,
+        })
+        .returned
+        .statement;
+  }
+
   return Method((b) => b
     ..name = 'build'
     ..returns = refer('FlutterDeckSlide')
@@ -635,28 +824,7 @@ Method _generateContentSlide(Map<String, dynamic> slide,
     ..requiredParameters.add(Parameter((b) => b
       ..name = 'context'
       ..type = refer('BuildContext')))
-    ..body = refer('FlutterDeckSlide.blank').call([], {
-      'builder': Method((b) => b
-        ..requiredParameters.add(Parameter((b) => b..name = 'context'))
-        ..body = refer('Center').newInstance([], {
-          'child': refer('Column').newInstance([], {
-            'mainAxisAlignment': refer('MainAxisAlignment.center', 'package:flutter/material.dart'),
-            'children': literalList([
-              refer('ResponsiveText').call([
-                literalString(title)
-              ], {
-                'style': refer('Theme.of')
-                    .call([refer('context')])
-                    .property('textTheme')
-                    .property('headlineLarge')
-              }),
-              refer('SizedBox').constInstance([], {'height': literalNum(16)}),
-              contentWidget,
-            ])
-          })
-        }).code,
-      ).closure,
-    }).returned.statement);
+    ..body = body);
 }
 
 void generateSlidesFile(
@@ -664,6 +832,7 @@ void generateSlidesFile(
   String? author,
   bool showAllBullets = false,
   String transition = 'none',
+  String? template,
 }) {
   final library = Library((b) {
     b.directives.addAll([
@@ -709,8 +878,7 @@ void generateSlidesFile(
         ..constructors.add(Constructor((b) => b
           ..constant = true
           ..initializers.add(refer('super').call([], {
-                'configuration':
-                    refer('FlutterDeckSlideConfiguration').constInstance([], {
+                'configuration': refer('FlutterDeckSlideConfiguration').constInstance([], {
                   'route': literalString('/$className'),
                   'title': literalString(title),
                   'hidden': literalBool(hidden),
@@ -719,8 +887,8 @@ void generateSlidesFile(
                   'transition': CodeExpression(Code(transitionValue)),
                 })
               }).code)))
-        ..methods
-            .add(_generateBuildMethod(slide, showAllBullets: showAllBullets))));
+        ..methods.add(_generateBuildMethod(slide,
+            showAllBullets: showAllBullets, template: template))));
     }
 
     b.body.add(Field((b) => b
