@@ -7,10 +7,10 @@ This project uses a Dart script to generate a Flutter Deck slide presentation fr
 To generate the slides, run the `generate_from_org.dart` script from the `tool` directory:
 
 ```bash
-dart tool/generate_from_org.dart [options]
+dart tool/generate_from_org.dart [path/to/your.org] [options]
 ```
 
-This will read `demo-slide-deck.org` and generate `lib/generated_slides.dart`.
+The script will read the specified `.org` file and generate `lib/generated_slides.dart`. If no `.org` file is provided, it will default to reading `demo-slide-deck.org`.
 
 ### Options
 
