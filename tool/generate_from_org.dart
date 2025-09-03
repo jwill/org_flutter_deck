@@ -11,8 +11,17 @@ void main(List<String> args) {
   if (transitionIndex != -1 && transitionIndex + 1 < args.length) {
     transition = args[transitionIndex + 1];
   }
-  final orgFile = File('demo-slide-deck.org');
+  final orgFile = File(args.firstWhere((arg) => arg.endsWith('.org'), orElse: () => 'demo-slide-deck.org'));
   final lines = orgFile.readAsLinesSync();
+
+  String? author;
+  final authorLine = lines.firstWhere(
+    (line) => line.startsWith('#+author:'),
+    orElse: () => '',
+  );
+  if (authorLine.isNotEmpty) {
+    author = authorLine.substring(9).trim();
+  }
 
   final slides = <Map<String, dynamic>>[];
   Map<String, dynamic>? currentSlide;
@@ -113,12 +122,12 @@ void main(List<String> args) {
             .toList();
         (currentSlide['table'] as List<List<String>>).add(cells);
       }
-    } else if (line.startsWith('#+begin_src')) {
+    } else if (line.toLowerCase().startsWith('#+begin_src')) {
       inCodeBlock = true;
       codeBlockLanguage = line.split(' ')[1];
       codeBlockContent = '';
       lastBullet = null;
-    } else if (line.startsWith('#+end_src')) {
+    } else if (line.toLowerCase().startsWith('#+end_src')) {
       inCodeBlock = false;
       if (currentSlide != null) {
         currentSlide['code'] = codeBlockContent;
@@ -126,20 +135,20 @@ void main(List<String> args) {
       }
     } else if (inCodeBlock) {
       codeBlockContent += '$line\n';
-    } else if (line.startsWith('#+BEGIN_FLUTTER')) {
+    } else if (line.toLowerCase().startsWith('#+begin_flutter')) {
       inFlutterBlock = true;
       flutterBlockContent = '';
-    } else if (line.startsWith('#+END_FLUTTER')) {
+    } else if (line.toLowerCase().startsWith('#+end_flutter')) {
       inFlutterBlock = false;
       if (currentSlide != null) {
         currentSlide['flutterWidget'] = flutterBlockContent;
       }
     } else if (inFlutterBlock) {
       flutterBlockContent += '$line\n';
-    } else if (line.startsWith('#+BEGIN_QUOTE')) {
+    } else if (line.toLowerCase().startsWith('#+begin_quote')) {
       inQuoteBlock = true;
       quoteBlockContent = '';
-    } else if (line.startsWith('#+END_QUOTE')) {
+    } else if (line.toLowerCase().startsWith('#+end_quote')) {
       inQuoteBlock = false;
       if (currentSlide != null) {
         final quoteLines = quoteBlockContent.trim().split('\n');
@@ -198,8 +207,12 @@ void main(List<String> args) {
     slides.add(currentSlide);
   }
 
-  generateSlidesFile(slides,
-      showAllBullets: showAllBullets, transition: transition);
+  generateSlidesFile(
+    slides,
+    author: author,
+    showAllBullets: showAllBullets,
+    transition: transition,
+  );
 }
 
 Method _generateBuildMethod(Map<String, dynamic> slide,
@@ -646,16 +659,18 @@ Method _generateContentSlide(Map<String, dynamic> slide,
     }).returned.statement);
 }
 
-void generateSlidesFile(List<Map<String, dynamic>> slides,
-    {bool showAllBullets = false, String transition = 'none'}) {
+void generateSlidesFile(
+  List<Map<String, dynamic>> slides, {
+  String? author,
+  bool showAllBullets = false,
+  String transition = 'none',
+}) {
   final library = Library((b) {
     b.directives.addAll([
       Directive.import('package:flutter/material.dart'),
       Directive.import('package:flutter_deck/flutter_deck.dart'),
       Directive.import('package:google_fonts/google_fonts.dart'),
-      Directive.import('package:flutter_deck_ai/src/painters.dart'),
-      Directive.import('package:flutter_deck_ai/src/responsive_text.dart'),
-      Directive.import('package:fl_chart/fl_chart.dart'),
+      Directive.import('package:dash_summit_talk/responsive_text.dart'),
     ]);
 
     for (var i = 0; i < slides.length; i++) {
@@ -716,11 +731,24 @@ void generateSlidesFile(List<Map<String, dynamic>> slides,
             slides.length, (i) => refer('GeneratedSlide${i + 1}').constInstance([])),
         refer('FlutterDeckSlideWidget'),
       ).code));
+
+    if (author != null) {
+      b.body.add(Field((b) => b
+        ..name = 'speakerInfo'
+        ..modifier = FieldModifier.constant
+        ..assignment = refer('FlutterDeckSpeakerInfo').constInstance([], {
+          'name': literalString(author),
+          'description': literalString(''),
+          'socialHandle': literalString(''),
+          'imagePath': literalString(''),
+        }).code));
+    }
   });
 
   final emitter = DartEmitter(useNullSafetySyntax: true);
   final pubspecContent = File('pubspec.yaml').readAsStringSync();
-  final languageVersionString = RegExp(r'sdk: ">=(\d+\.\d+\.\d+)').firstMatch(pubspecContent)?.group(1);
+  final languageVersionString =
+      RegExp(r'sdk: ">=(\d+\.\d+\.\d+)').firstMatch(pubspecContent)?.group(1);
   final languageVersion = languageVersionString != null
       ? Version.parse(languageVersionString)
       : Version.none;
