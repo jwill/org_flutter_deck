@@ -1,4 +1,4 @@
-# Flutter Deck AI Slide Generator
+# Flutter Deck Slide Generator
 
 This project uses a Dart script to generate a Flutter Deck slide presentation from an Org Mode file.
 
