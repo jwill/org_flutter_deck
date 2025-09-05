@@ -144,7 +144,7 @@ void main(List<String> args) {
     } else if (line.toLowerCase().startsWith('#+end_src')) {
       inCodeBlock = false;
       if (currentSlide != null) {
-        currentSlide['code'] = codeBlockContent;
+        currentSlide['code'] = RegExp.escape(codeBlockContent);
         currentSlide['language'] = codeBlockLanguage;
       }
     } else if (inCodeBlock) {
